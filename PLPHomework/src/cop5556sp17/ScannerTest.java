@@ -217,6 +217,48 @@ public class ScannerTest {
 		assertEquals(Kind.MINUS, token11.kind);
 		assertEquals(5, token11.pos);
 		
+		//testing LT,LE,ASSIGN
+		input = "<- < <= <";
+		scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token15 = scanner.nextToken();		
+		assertEquals(Kind.ASSIGN, token15.kind);
+		assertEquals(0, token15.pos);
+		
+		Scanner.Token token16 = scanner.nextToken();
+		assertEquals(Kind.LT, token16.kind);
+		assertEquals(3, token16.pos);
+		
+		Scanner.Token token12 = scanner.nextToken();
+		assertEquals(Kind.LE, token12.kind);
+		assertEquals(5, token12.pos);
+		
+		Scanner.Token token13 = scanner.nextToken();
+		assertEquals(Kind.LT, token13.kind);
+		assertEquals(8, token13.pos);
+		
+		Scanner.Token token14 = scanner.nextToken();
+		assertEquals(Kind.EOF, token14.kind);
+		assertEquals(9, token14.pos);
+		
+		//testing GT,GW
+		input = "> >= >";
+		scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token17 = scanner.nextToken();		
+		assertEquals(Kind.GT, token17.kind);
+		assertEquals(0, token17.pos);
+		
+		Scanner.Token token18 = scanner.nextToken();
+		assertEquals(Kind.GE, token18.kind);
+		assertEquals(2, token18.pos);
+		
+		Scanner.Token token19 = scanner.nextToken();
+		assertEquals(Kind.GT, token19.kind);
+		assertEquals(5, token19.pos);
+	
 	}
 	
 }
