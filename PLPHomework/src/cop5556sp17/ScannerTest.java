@@ -258,7 +258,26 @@ public class ScannerTest {
 		Scanner.Token token19 = scanner.nextToken();
 		assertEquals(Kind.GT, token19.kind);
 		assertEquals(5, token19.pos);
+	}
 	
+	@Test
+	public void testReserveWords() throws IllegalCharException, IllegalNumberException{
+		//testing reserved words
+		String[] names = new String[] {"KW_INTEGER","KW_BOOLEAN","KW_IMAGE","KW_URL","KW_FILE","KW_FRAME","KW_WHILE","KW_IF","OP_SLEEP","KW_SCREENHEIGHT","KW_SCREENWIDTH","OP_GRAY","OP_CONVOLVE","OP_BLUR","KW_SCALE","OP_WIDTH","OP_HEIGHT","KW_XLOC","KW_YLOC","KW_HIDE","KW_SHOW","KW_MOVE","KW_TRUE","KW_FALSE"};
+		String input = " integer boolean image url file frame while if sleep screenheight screenwidth gray convolve blur scale width height xloc yloc hide show move true false";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token20;
+		int resflag;
+		for(String s:names){
+			resflag = 0;
+			token20 = scanner.nextToken();
+			if(s.equals(String.valueOf(token20.kind))){
+				resflag = 1;	
+			}
+			assertEquals(1,resflag);
+		}
 	}
 	
 }
