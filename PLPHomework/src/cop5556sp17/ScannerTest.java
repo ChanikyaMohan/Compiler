@@ -77,7 +77,7 @@ public class ScannerTest {
 	@Test
 	public void testIntOverflowError() throws IllegalCharException, IllegalNumberException{
 		//TODO handle space after token
-		String input = "99999999999999999 ";
+		String input = "99999999999999999";
 		Scanner scanner = new Scanner(input);
 		thrown.expect(IllegalNumberException.class);
 		scanner.scan();		
@@ -85,37 +85,66 @@ public class ScannerTest {
 	
 	@Test
 	public void testIdentifier() throws IllegalCharException, IllegalNumberException{
-		String input = "chandu - ";
+		String input = "chandu -";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		
 		Scanner.Token token = scanner.nextToken();
+		Scanner.Token token1 = scanner.nextToken();
 		
-		System.out.println(token.kind);
-		System.out.println(token.pos);
-		System.out.println(token.length);
-		System.out.println(token.getText());
+		//System.out.println(token.kind);
+		//System.out.println(token.pos);
+		//System.out.println(token.length);
+		//System.out.println(token.getText());
 		
 		assertEquals(Kind.IDENT, token.kind);
 		assertEquals(0, token.pos);
 		
+		//System.out.println(token1.kind);
+		//System.out.println(token1.pos);
+		//System.out.println(token1.length);
+		//System.out.println(token1.getText());
+		
+		assertEquals(Kind.MINUS, token1.kind);
+		assertEquals(0, token.pos);
+		
 	}
+	
 	@Test
 	public void testIdentifierReserve() throws IllegalCharException, IllegalNumberException{
-		String input = "integer - ";
+		String input = "integer * =";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		
 		Scanner.Token token = scanner.nextToken();
+		Scanner.Token token1 = scanner.nextToken();
+		Scanner.Token token2 = scanner.nextToken();
 		
-		System.out.println(token.kind);
-		System.out.println(token.pos);
-		System.out.println(token.length);
-		System.out.println(token.getText());
+		thrown.expect(IllegalCharException.class);
+		
+		//System.out.println(token.kind);
+		//System.out.println(token.pos);
+		//System.out.println(token.length);
+		//System.out.println(token.getText());
 		
 		assertEquals(Kind.KW_INTEGER, token.kind);
 		assertEquals(0, token.pos);
 		
+		System.out.println(token1.kind);
+		System.out.println(token1.pos);
+		System.out.println(token1.length);
+		System.out.println(token1.getText());
+		
+		assertEquals(Kind.DIV, token1.kind);
+		assertEquals(8, token1.pos);
+		
+		System.out.println(token2.kind);
+		System.out.println(token2.pos);
+		System.out.println(token2.length);
+		System.out.println(token2.getText());
+		
+		assertEquals(Kind.KW_INTEGER, token2.kind);
+		assertEquals(10, token2.pos);
 	}
 	
 }

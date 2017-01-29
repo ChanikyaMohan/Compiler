@@ -201,27 +201,27 @@ public class Scanner {
 	            	}
 	            } break;
 	            case IN_IDENT: {
-	            	if (Character.isJavaIdentifierPart(ch)) {
+	            	  if (Character.isJavaIdentifierPart(ch)) {
 	                    pos++;
-	              } else {
-	            	  int reservedFound = 0;
-	            	  String subident = new String(chars.substring(startPos, pos)); 
-	            	  for(Kind k: Kind.values()){
-	            		  //System.out.println("substring: "+subident);
-	            		  String ktext = new String(k.getText());
-	            		  //System.out.println(k.getText());
-	            		  if(ktext.equals(subident)){
-	            			  reservedFound = 1;
-	            			  tokens.add(new Token(k,startPos,pos - startPos));
-	            			  break;
-	            		  }
-	            	  }
-	            	  //System.out.println(reservedFound);
-	            	  if(reservedFound == 0){
-	            		  tokens.add(new Token(Kind.IDENT, startPos, pos - startPos));	              
-	            	  }
-	            	  state = State.START;
-	              }
+		              } else {
+		            	  int reservedFound = 0;
+		            	  String subident = new String(chars.substring(startPos, pos)); 
+		            	  for(Kind k: Kind.values()){
+		            		  //System.out.println("substring: "+subident);
+		            		  String ktext = new String(k.getText());
+		            		  //System.out.println(k.getText());
+		            		  if(ktext.equals(subident)){
+		            			  reservedFound = 1;
+		            			  tokens.add(new Token(k,startPos,pos - startPos));
+		            			  break;
+		            		  }
+		            	  }
+		            	  //System.out.println(reservedFound);
+		            	  if(reservedFound == 0){
+		            		  tokens.add(new Token(Kind.IDENT, startPos, pos - startPos));	              
+		            	  }
+		            	  state = State.START;
+		              }
 	            }  break;
 	            case AFTER_MINUS: {
 	            	if(chars.charAt(pos) == '>'){
@@ -263,7 +263,7 @@ public class Scanner {
 	            	if(chars.charAt(pos)  == '\n'){
 	            		//TODO line number
 	            		//lineNumber++;
-	            	} else if(chars.charAt(pos) == '*' && chars.charAt(pos+1)=='/'){
+	            	} else if(pos<length-2 && chars.charAt(pos) == '*' && chars.charAt(pos+1)=='/'){
 	            		pos = pos + 2;
 	            		state = State.START;
 	            	} else {
@@ -304,6 +304,81 @@ public class Scanner {
 	        }// main - switch(state)
 	    } // while
 	    
+	    // ---------- To Handle breaking out of while loop not being in start state-------------
+	    switch (state) {
+	    
+	    case START: {
+	    } break;
+	    
+        case IN_DIGIT: {
+    		try{
+    			Integer.parseInt(chars.substring(startPos, pos));
+    		}catch(Exception NumberFormatException){
+    			throw new IllegalNumberException(
+    					"Illegal num at" +startPos);
+    		}
+    		tokens.add(new Token(Kind.INT_LIT, startPos, pos - startPos));
+    		state = State.START;
+        } break;
+        
+        case IN_IDENT: {
+        	  int reservedFound = 0;
+        	  String subident = new String(chars.substring(startPos, pos)); 
+        	  for(Kind k: Kind.values()){
+        		  //System.out.println("substring: "+subident);
+        		  String ktext = new String(k.getText());
+        		  //System.out.println(k.getText());
+        		  if(ktext.equals(subident)){
+        			  reservedFound = 1;
+        			  tokens.add(new Token(k,startPos,pos - startPos));
+        			  break;
+        		  }
+        	  }
+        	  //System.out.println(reservedFound);
+        	  if(reservedFound == 0){
+        		  tokens.add(new Token(Kind.IDENT, startPos, pos - startPos));	              
+        	  }
+        	  state = State.START;
+        }  break;
+        
+		case AFTER_MINUS: {
+        		tokens.add(new Token(Kind.MINUS, startPos, 1));pos++;
+        		state = State.START;
+        } break;
+        
+		case AFTER_EQ: {
+        		// TODO implement throwing an error if we get only '='
+        		throw new IllegalCharException(
+                        "illegal char " +chars.charAt(pos-1)+" at pos "+pos);
+        } 
+        
+		case AFTER_NOT: {
+        		tokens.add(new Token(Kind.NOT, startPos, 1));pos++;
+        		state = State.START;
+        } break;
+        
+		case AFTER_DIV: {
+        		tokens.add(new Token(Kind.DIV, startPos, 1));pos++;
+        		state = State.START;
+        } break;
+        case COMMENT: {
+        	//do nothing
+        	//its not a problem
+        } break;
+        case AFTER_OR: {
+        		tokens.add(new Token(Kind.OR, startPos, pos - startPos));pos++;
+        		state = State.START;
+        } break;
+        case AFTER_LESS: {
+        		tokens.add(new Token(Kind.LT, startPos, pos - startPos));
+        		state = State.START;
+        } break;
+        case AFTER_GREAT: {
+        		tokens.add(new Token(Kind.GT, startPos, pos - startPos));
+        		state = State.START;
+        } break;
+        default:  assert false;
+    }// second - switch(state)
 
 		
 		tokens.add(new Token(Kind.EOF,pos,0));
