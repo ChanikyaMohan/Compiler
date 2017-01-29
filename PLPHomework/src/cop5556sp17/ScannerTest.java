@@ -37,6 +37,12 @@ public class ScannerTest {
 		assertEquals(0, token.pos);
 		String text = SEMI.getText();
 		assertEquals(text.length(), token.length);
+		System.out.println(token.kind);
+		System.out.println(token.pos);
+		System.out.println(token.length);
+		System.out.println(token.getText());
+		
+		//System.out.println(token);
 		assertEquals(text, token.getText());
 		//get the next token and check its kind, position, and contents
 		Scanner.Token token1 = scanner.nextToken();
@@ -65,7 +71,8 @@ public class ScannerTest {
 	 */
 	@Test
 	public void testIntOverflowError() throws IllegalCharException, IllegalNumberException{
-		String input = "99999999999999999";
+		//TODO handle space after token
+		String input = "99999999999999999 ";
 		Scanner scanner = new Scanner(input);
 		thrown.expect(IllegalNumberException.class);
 		scanner.scan();		

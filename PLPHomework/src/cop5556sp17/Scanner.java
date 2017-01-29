@@ -36,7 +36,7 @@ public class Scanner {
 	 * Kind enum
 	 */
 	public static enum State {
-		START,IN_DIGIT,IN_IDENT,AFTER_MINUS,AFTER_EQ,AFTER_NOT,AFTER_DIV,COMMENT;
+		START,IN_DIGIT,IN_IDENT,AFTER_MINUS,AFTER_EQ,AFTER_NOT,AFTER_DIV,COMMENT,AFTER_OR,AFTER_LESS,AFTER_GREAT;
 	}
 	
 	/**
@@ -90,7 +90,8 @@ public class Scanner {
 		//returns the text of this Token
 		public String getText() {
 			//TODO IMPLEMENT THIS
-			return null;
+			String text = new String(chars.substring(pos, pos+length));
+			return text;
 		}
 		
 		//returns a LinePos object representing the line and column of this Token
@@ -169,6 +170,9 @@ public class Scanner {
 	                    case '-': {state = State.AFTER_MINUS;pos++;} break;
 	                    case '=': {state = State.AFTER_EQ;pos++;}break;
 	                    case '!': {state = State.AFTER_NOT;pos++;}break;
+	                    case '|': {state = State.AFTER_OR;pos++;} break;
+	                    case '<': {state = State.AFTER_LESS;pos++;} break;
+	                    case '>': {state = State.AFTER_GREAT;pos++;} break;
 	                    case '0': {tokens.add(new Token(Kind.INT_LIT,startPos, 1));pos++;}break;
 	                    default: {
 	                        if (Character.isDigit(ch)) {state = State.IN_DIGIT;pos++;} 
@@ -187,8 +191,9 @@ public class Scanner {
 	            	} else {
 	            		try{
 	            			Integer.parseInt(chars.substring(startPos, pos - startPos));
-	            		}catch(NumberFormatException e){
-	            			throw new IllegalNumberException("Illegal num at" +startPos);
+	            		}catch(Exception NumberFormatException){
+	            			throw new IllegalNumberException(
+	            					"Illegal num at" +startPos);
 	            		}
 	            		tokens.add(new Token(Kind.INT_LIT, startPos, pos - startPos));
 	            		state = State.START;
@@ -241,9 +246,41 @@ public class Scanner {
 	            case COMMENT: {
 	            	if(chars.charAt(pos)  == '\n'){
 	            		//TODO linenumber
-	            		lineNumber++;
-	            		pos++;
+	            		//lineNumber++;
 	            	} else if(chars.charAt(pos) == '*' && chars.charAt(pos+1)=='/'){
+	            		pos = pos + 2;
+	            		state = State.START;
+	            	} else {
+	            		pos++;
+	            	}
+	            } break;
+	            case AFTER_OR: {
+	            	if(chars.charAt(pos) == '-' && chars.charAt(pos+1) == '>'){
+	            		tokens.add(new Token(Kind.BARARROW, startPos, pos - startPos));pos=pos+2;
+	            		state = State.START;
+	            	} else {
+	            		tokens.add(new Token(Kind.OR, startPos, pos - startPos));pos++;
+	            		state = State.START;
+	            	}
+	            } break;
+	            case AFTER_LESS: {
+	            	if(chars.charAt(pos) == '-'){
+	            		tokens.add(new Token(Kind.ASSIGN, startPos, pos - startPos));pos++;
+	            		state = State.START;
+	            	} else if(chars.charAt(pos) == '=') {
+	            		tokens.add(new Token(Kind.LE, startPos, pos - startPos));pos++;
+	            		state = State.START;
+	            	} else {
+	            		tokens.add(new Token(Kind.LT, startPos, pos - startPos));
+	            		state = State.START;
+	            	}
+	            } break;
+	            case AFTER_GREAT: {
+	            	if(chars.charAt(pos) == '='){
+	            		tokens.add(new Token(Kind.GE, startPos, pos - startPos));pos++;
+	            		state = State.START;
+	            	} else {
+	            		tokens.add(new Token(Kind.GT, startPos, pos - startPos));
 	            		state = State.START;
 	            	}
 	            } break;
