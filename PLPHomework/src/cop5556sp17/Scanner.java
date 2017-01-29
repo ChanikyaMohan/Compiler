@@ -36,7 +36,7 @@ public class Scanner {
 	 * Kind enum
 	 */
 	public static enum State {
-		START,IN_DIGIT,IN_IDENT,AFTER_MINUS,AFTER_EQ;
+		START,IN_DIGIT,IN_IDENT,AFTER_MINUS,AFTER_EQ,AFTER_NOT,AFTER_DIV,COMMENT;
 	}
 	
 	/**
@@ -141,7 +141,7 @@ public class Scanner {
 	 */
 	public Scanner scan() throws IllegalCharException, IllegalNumberException {
 		int pos = 0; 
-		//TODO IMPLEMENT THIS!!!!
+		//TODO comment
 	    int length = chars.length();
 	    State state = State.START;
 	    int startPos = 0;
@@ -164,10 +164,11 @@ public class Scanner {
 	                    case '&': {tokens.add(new Token(Kind.AND, startPos, 1));pos++;} break;
 	                    case '+': {tokens.add(new Token(Kind.PLUS, startPos, 1));pos++;} break;
 	                    case '*': {tokens.add(new Token(Kind.TIMES, startPos, 1));pos++;} break;
-	                    case '/': {tokens.add(new Token(Kind.DIV, startPos, 1));pos++;} break;
 	                    case '%': {tokens.add(new Token(Kind.MOD, startPos, 1));pos++;} break;
+	                    case '/': {state = State.AFTER_DIV;pos++;} break;
 	                    case '-': {state = State.AFTER_MINUS;pos++;} break;
 	                    case '=': {state = State.AFTER_EQ;pos++;}break;
+	                    case '!': {state = State.AFTER_NOT;pos++;}break;
 	                    case '0': {tokens.add(new Token(Kind.INT_LIT,startPos, 1));pos++;}break;
 	                    default: {
 	                        if (Character.isDigit(ch)) {state = State.IN_DIGIT;pos++;} 
@@ -181,7 +182,17 @@ public class Scanner {
 	                } // switch (ch)
 	            }  break;// case start end
 	            case IN_DIGIT: {
-	            	if()
+	            	if(Character.isDigit(ch)){
+	            		pos++;
+	            	} else {
+	            		try{
+	            			Integer.parseInt(chars.substring(startPos, pos - startPos));
+	            		}catch(NumberFormatException e){
+	            			throw new IllegalNumberException("Illegal num at" +startPos);
+	            		}
+	            		tokens.add(new Token(Kind.INT_LIT, startPos, pos - startPos));
+	            		state = State.START;
+	            	}
 	            } break;
 	            case IN_IDENT: {
 	            	if (Character.isJavaIdentifierPart(ch)) {
@@ -206,7 +217,34 @@ public class Scanner {
 	            		state = State.START;
 	            	} else {
 	            		// TODO implement throwing an error if we get only '='
-	            		assert false;
+	            		throw new IllegalCharException(
+                                "illegal char " +chars.charAt(pos)+" at pos "+pos);
+	            	}
+	            } break;
+	            case AFTER_NOT: {
+	            	if(chars.charAt(pos) == '='){
+	            		tokens.add(new Token(Kind.NOTEQUAL, startPos, pos - startPos));pos++;
+	            		state = State.START;
+	            	} else {
+	            		tokens.add(new Token(Kind.NOT, startPos, 1));pos++;
+	            		state = State.START;
+	            	}
+	            } break;
+	            case AFTER_DIV: {
+	            	if(chars.charAt(pos) == '*'){
+	            		state = State.COMMENT;pos++;
+	            	} else {
+	            		tokens.add(new Token(Kind.DIV, startPos, 1));pos++;
+	            		state = State.START;
+	            	}
+	            } break;
+	            case COMMENT: {
+	            	if(chars.charAt(pos)  == '\n'){
+	            		//TODO linenumber
+	            		lineNumber++;
+	            		pos++;
+	            	} else if(chars.charAt(pos) == '*' && chars.charAt(pos+1)=='/'){
+	            		state = State.START;
 	            	}
 	            } break;
 	            default:  assert false;
@@ -223,7 +261,12 @@ public class Scanner {
 
 	public int skipWhiteSpace(int pos) {
 		// TODO Auto-generated method stub
-		return 0;
+		char ch = chars.charAt(pos);
+		while(Character.isWhitespace(ch)){
+			pos++;
+			ch = chars.charAt(pos);
+		}
+		return pos;
 	}
 
 
