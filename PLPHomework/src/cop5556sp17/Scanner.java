@@ -116,7 +116,8 @@ public class Scanner {
 		 */
 		public int intVal() throws NumberFormatException{
 			//TODO IMPLEMENT THIS
-			return 0;
+			int val = Integer.parseInt(chars.substring(pos, pos+length));
+			return val;
 		}
 		
 	}
