@@ -1,6 +1,8 @@
 package cop5556sp17;
 
-import static cop5556sp17.Scanner.Kind.SEMI;
+import static cop5556sp17.Scanner.Kind;
+
+
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Rule;
@@ -33,25 +35,25 @@ public class ScannerTest {
 		scanner.scan();
 		//get the first token and check its kind, position, and contents
 		Scanner.Token token = scanner.nextToken();
-		assertEquals(SEMI, token.kind);
+		assertEquals(Kind.SEMI, token.kind);
 		assertEquals(0, token.pos);
-		String text = SEMI.getText();
+		String text = Kind.SEMI.getText();
 		assertEquals(text.length(), token.length);
-		System.out.println(token.kind);
-		System.out.println(token.pos);
-		System.out.println(token.length);
-		System.out.println(token.getText());
+		//System.out.println(token.kind);
+		//System.out.println(token.pos);
+		//System.out.println(token.length);
+		//System.out.println(token.getText());
 		
 		//System.out.println(token);
 		assertEquals(text, token.getText());
 		//get the next token and check its kind, position, and contents
 		Scanner.Token token1 = scanner.nextToken();
-		assertEquals(SEMI, token1.kind);
+		assertEquals(Kind.SEMI, token1.kind);
 		assertEquals(1, token1.pos);
 		assertEquals(text.length(), token1.length);
 		assertEquals(text, token1.getText());
 		Scanner.Token token2 = scanner.nextToken();
-		assertEquals(SEMI, token2.kind);
+		assertEquals(Kind.SEMI, token2.kind);
 		assertEquals(2, token2.pos);
 		assertEquals(text.length(), token2.length);
 		assertEquals(text, token2.getText());
@@ -69,6 +71,9 @@ public class ScannerTest {
 	 * @throws IllegalCharException
 	 * @throws IllegalNumberException
 	 */
+	
+//TODO  more tests
+	
 	@Test
 	public void testIntOverflowError() throws IllegalCharException, IllegalNumberException{
 		//TODO handle space after token
@@ -77,7 +82,40 @@ public class ScannerTest {
 		thrown.expect(IllegalNumberException.class);
 		scanner.scan();		
 	}
-
-//TODO  more tests
+	
+	@Test
+	public void testIdentifier() throws IllegalCharException, IllegalNumberException{
+		String input = "chandu - ";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token = scanner.nextToken();
+		
+		System.out.println(token.kind);
+		System.out.println(token.pos);
+		System.out.println(token.length);
+		System.out.println(token.getText());
+		
+		assertEquals(Kind.IDENT, token.kind);
+		assertEquals(0, token.pos);
+		
+	}
+	@Test
+	public void testIdentifierReserve() throws IllegalCharException, IllegalNumberException{
+		String input = "integer - ";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token = scanner.nextToken();
+		
+		System.out.println(token.kind);
+		System.out.println(token.pos);
+		System.out.println(token.length);
+		System.out.println(token.getText());
+		
+		assertEquals(Kind.KW_INTEGER, token.kind);
+		assertEquals(0, token.pos);
+		
+	}
 	
 }

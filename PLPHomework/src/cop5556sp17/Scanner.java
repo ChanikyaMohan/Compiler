@@ -191,7 +191,7 @@ public class Scanner {
 	            		pos++;
 	            	} else {
 	            		try{
-	            			Integer.parseInt(chars.substring(startPos, pos - startPos));
+	            			Integer.parseInt(chars.substring(startPos, pos));
 	            		}catch(Exception NumberFormatException){
 	            			throw new IllegalNumberException(
 	            					"Illegal num at" +startPos);
@@ -204,8 +204,23 @@ public class Scanner {
 	            	if (Character.isJavaIdentifierPart(ch)) {
 	                    pos++;
 	              } else {
-	                      tokens.add(new Token(Kind.IDENT, startPos, pos - startPos));
-	                      state = State.START;
+	            	  int reservedFound = 0;
+	            	  String subident = new String(chars.substring(startPos, pos)); 
+	            	  for(Kind k: Kind.values()){
+	            		  //System.out.println("substring: "+subident);
+	            		  String ktext = new String(k.getText());
+	            		  //System.out.println(k.getText());
+	            		  if(ktext.equals(subident)){
+	            			  reservedFound = 1;
+	            			  tokens.add(new Token(k,startPos,pos - startPos));
+	            			  break;
+	            		  }
+	            	  }
+	            	  //System.out.println(reservedFound);
+	            	  if(reservedFound == 0){
+	            		  tokens.add(new Token(Kind.IDENT, startPos, pos - startPos));	              
+	            	  }
+	            	  state = State.START;
 	              }
 	            }  break;
 	            case AFTER_MINUS: {
@@ -246,7 +261,7 @@ public class Scanner {
 	            } break;
 	            case COMMENT: {
 	            	if(chars.charAt(pos)  == '\n'){
-	            		//TODO linenumber
+	            		//TODO line number
 	            		//lineNumber++;
 	            	} else if(chars.charAt(pos) == '*' && chars.charAt(pos+1)=='/'){
 	            		pos = pos + 2;
@@ -302,7 +317,11 @@ public class Scanner {
 		char ch = chars.charAt(pos);
 		while(Character.isWhitespace(ch)){
 			pos++;
-			ch = chars.charAt(pos);
+			if(pos<chars.length()){
+				ch = chars.charAt(pos);				
+			} else {
+				break;
+			}
 		}
 		return pos;
 	}
