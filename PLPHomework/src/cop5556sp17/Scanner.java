@@ -31,9 +31,17 @@ public class Scanner {
 			return text;
 		}
 	}
-/**
- * Thrown by Scanner when an illegal character is encountered
- */
+	
+	/**
+	 * Kind enum
+	 */
+	public static enum State {
+		START,IN_DIGIT,IN_IDENT,AFTER_MINUS,AFTER_EQ;
+	}
+	
+	/**
+	 * Thrown by Scanner when an illegal character is encountered
+	 */
 	@SuppressWarnings("serial")
 	public static class IllegalCharException extends Exception {
 		public IllegalCharException(String message) {
@@ -134,8 +142,88 @@ public class Scanner {
 	public Scanner scan() throws IllegalCharException, IllegalNumberException {
 		int pos = 0; 
 		//TODO IMPLEMENT THIS!!!!
+	    int length = chars.length();
+	    State state = State.START;
+	    int startPos = 0;
+	    int ch;
+	    while (pos < length) {
+	        ch = pos < length ? chars.charAt(pos) : -1;
+	        switch (state) {
+	            case START: {
+	                pos = skipWhiteSpace(pos);
+	                ch = pos < length ? chars.charAt(pos) : -1;
+	                startPos = pos;
+	                switch (ch) {
+	                    //case -1: {tokens.add(new Token(Kind.EOF, pos, 0)); pos++;}  break;
+	                    case ';': {tokens.add(new Token(Kind.SEMI, startPos, 1));pos++;} break;
+	                    case ',': {tokens.add(new Token(Kind.COMMA, startPos, 1));pos++;} break;
+	                    case '(': {tokens.add(new Token(Kind.LPAREN, startPos, 1));pos++;} break;
+	                    case ')': {tokens.add(new Token(Kind.RPAREN, startPos, 1));pos++;} break;
+	                    case '{': {tokens.add(new Token(Kind.LBRACE, startPos, 1));pos++;} break;
+	                    case '}': {tokens.add(new Token(Kind.RBRACE, startPos, 1));pos++;} break;
+	                    case '&': {tokens.add(new Token(Kind.AND, startPos, 1));pos++;} break;
+	                    case '+': {tokens.add(new Token(Kind.PLUS, startPos, 1));pos++;} break;
+	                    case '*': {tokens.add(new Token(Kind.TIMES, startPos, 1));pos++;} break;
+	                    case '/': {tokens.add(new Token(Kind.DIV, startPos, 1));pos++;} break;
+	                    case '%': {tokens.add(new Token(Kind.MOD, startPos, 1));pos++;} break;
+	                    case '-': {state = State.AFTER_MINUS;pos++;} break;
+	                    case '=': {state = State.AFTER_EQ;pos++;}break;
+	                    case '0': {tokens.add(new Token(Kind.INT_LIT,startPos, 1));pos++;}break;
+	                    default: {
+	                        if (Character.isDigit(ch)) {state = State.IN_DIGIT;pos++;} 
+	                        else if (Character.isJavaIdentifierStart(ch)) {
+	                             state = State.IN_IDENT;pos++;
+	                         } 
+	                         else {throw new IllegalCharException(
+	                                    "illegal char " +ch+" at pos "+pos);
+	                         }
+	                      }
+	                } // switch (ch)
+	            }  break;// case start end
+	            case IN_DIGIT: {
+	            	if()
+	            } break;
+	            case IN_IDENT: {
+	            	if (Character.isJavaIdentifierPart(ch)) {
+	                    pos++;
+	              } else {
+	                      tokens.add(new Token(Kind.IDENT, startPos, pos - startPos));
+	                      state = State.START;
+	              }
+	            }  break;
+	            case AFTER_MINUS: {
+	            	if(chars.charAt(pos) == '>'){
+	            		tokens.add(new Token(Kind.ARROW, startPos, pos - startPos));pos++;
+	            		state = State.START;
+	            	} else {
+	            		tokens.add(new Token(Kind.MINUS, startPos, 1));pos++;
+	            		state = State.START;
+	            	}
+	            } break;
+	            case AFTER_EQ: {
+	            	if(chars.charAt(pos) == '='){
+	            		tokens.add(new Token(Kind.EQUAL, startPos, pos - startPos));pos++;
+	            		state = State.START;
+	            	} else {
+	            		// TODO implement throwing an error if we get only '='
+	            		assert false;
+	            	}
+	            } break;
+	            default:  assert false;
+	        }// main - switch(state)
+	    } // while
+	    
+
+		
 		tokens.add(new Token(Kind.EOF,pos,0));
 		return this;  
+	}
+
+
+
+	public int skipWhiteSpace(int pos) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 
