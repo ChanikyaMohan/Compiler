@@ -114,13 +114,13 @@ public class ScannerTest {
 	public void testIdentifierReserve() throws IllegalCharException, IllegalNumberException{
 		String input = "integer * =";
 		Scanner scanner = new Scanner(input);
+		thrown.expect(IllegalCharException.class);
 		scanner.scan();
 		
 		Scanner.Token token = scanner.nextToken();
 		Scanner.Token token1 = scanner.nextToken();
-		Scanner.Token token2 = scanner.nextToken();
 		
-		thrown.expect(IllegalCharException.class);
+
 		
 		//System.out.println(token.kind);
 		//System.out.println(token.pos);
@@ -137,14 +137,86 @@ public class ScannerTest {
 		
 		assertEquals(Kind.DIV, token1.kind);
 		assertEquals(8, token1.pos);
+
+	}
+	
+	@Test
+	public void testOtherOpsBreakCase() throws IllegalCharException, IllegalNumberException{
 		
-		System.out.println(token2.kind);
-		System.out.println(token2.pos);
-		System.out.println(token2.length);
-		System.out.println(token2.getText());
+		//testing minus and arrow
+		String input = "-";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
 		
-		assertEquals(Kind.KW_INTEGER, token2.kind);
-		assertEquals(10, token2.pos);
+		Scanner.Token token = scanner.nextToken();		
+		
+		//System.out.println(token.kind);
+		//System.out.println(token.pos);
+		//System.out.println(token.length);
+		//System.out.println(token.getText());
+		
+		assertEquals(Kind.MINUS, token.kind);
+		assertEquals(0, token.pos);
+		
+		input = "-> -";
+		scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token2 = scanner.nextToken();
+		assertEquals(Kind.ARROW,token2.kind);
+		assertEquals(0,token2.pos);
+		
+		Scanner.Token token3 = scanner.nextToken();
+		assertEquals(Kind.MINUS,token3.kind);
+		assertEquals(3,token3.pos);
+		
+		//testing not and not equal
+		input = "! != !";
+		scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token4 = scanner.nextToken();		
+		assertEquals(Kind.NOT, token4.kind);
+		assertEquals(0, token4.pos);
+		
+		Scanner.Token token5 = scanner.nextToken();
+		assertEquals(Kind.NOTEQUAL, token5.kind);
+		assertEquals(2, token5.pos);
+		
+		Scanner.Token token6 = scanner.nextToken();
+		assertEquals(Kind.NOT, token6.kind);
+		assertEquals(5, token6.pos);
+		
+		//testing div and comment
+		input = "/ /* this is comment */ /*dfdfsfd";
+		scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token7 = scanner.nextToken();		
+		assertEquals(Kind.DIV, token7.kind);
+		assertEquals(0, token7.pos);
+		
+		Scanner.Token token8 = scanner.nextToken();
+		assertEquals(Kind.EOF, token8.kind);
+		assertEquals(33, token8.pos);
+		
+		//testing BARARROW
+		input = "|-> |-";
+		scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token9 = scanner.nextToken();		
+		assertEquals(Kind.BARARROW, token9.kind);
+		assertEquals(0, token9.pos);
+		
+		Scanner.Token token10 = scanner.nextToken();
+		assertEquals(Kind.OR, token10.kind);
+		assertEquals(4, token10.pos);
+		
+		Scanner.Token token11 = scanner.nextToken();
+		assertEquals(Kind.MINUS, token11.kind);
+		assertEquals(5, token11.pos);
+		
 	}
 	
 }

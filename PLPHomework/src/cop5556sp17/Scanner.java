@@ -271,11 +271,11 @@ public class Scanner {
 	            	}
 	            } break;
 	            case AFTER_OR: {
-	            	if(chars.charAt(pos) == '-' && chars.charAt(pos+1) == '>'){
+	            	if(pos<length-1 && chars.charAt(pos) == '-' && chars.charAt(pos+1) == '>'){
 	            		tokens.add(new Token(Kind.BARARROW, startPos, pos - startPos));pos=pos+2;
 	            		state = State.START;
 	            	} else {
-	            		tokens.add(new Token(Kind.OR, startPos, pos - startPos));pos++;
+	            		tokens.add(new Token(Kind.OR, startPos, pos - startPos));
 	            		state = State.START;
 	            	}
 	            } break;
