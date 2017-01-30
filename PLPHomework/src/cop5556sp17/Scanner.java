@@ -103,7 +103,7 @@ public class Scanner {
 			if(idx < 0){
 				idx=-1*(idx+1)-1;
 			}
-			return new LinePos(idx+1, pos-lineStartPos.get(idx)+1);
+			return new LinePos(idx, pos-lineStartPos.get(idx));
 		}
 
 		Token(Kind kind, int pos, int length) {
@@ -154,6 +154,7 @@ public class Scanner {
 	    State state = State.START;
 	    int startPos = 0;
 	    lineStartPos.add(0);
+	    int inStartEOFFlag = 0;
 	    int ch;
 	    while (pos < length) {
 	        ch = pos < length ? chars.charAt(pos) : -1;
@@ -163,7 +164,7 @@ public class Scanner {
 	                ch = pos < length ? chars.charAt(pos) : -1;
 	                startPos = pos;
 	                switch (ch) {
-	                    case -1: {tokens.add(new Token(Kind.EOF, pos, 0)); pos++;}  break;
+	                    case -1: {inStartEOFFlag = 1;tokens.add(new Token(Kind.EOF, pos, 0)); pos++;}  break;
 	                    case ';': {tokens.add(new Token(Kind.SEMI, startPos, 1));pos++;} break;
 	                    case ',': {tokens.add(new Token(Kind.COMMA, startPos, 1));pos++;} break;
 	                    case '(': {tokens.add(new Token(Kind.LPAREN, startPos, 1));pos++;} break;
@@ -394,7 +395,10 @@ public class Scanner {
     }// second - switch(state)
 
 		
-		tokens.add(new Token(Kind.EOF,pos,0));
+		if(inStartEOFFlag == 0){
+			tokens.add(new Token(Kind.EOF,pos,0));
+			
+		}
 		return this;  
 	}
 

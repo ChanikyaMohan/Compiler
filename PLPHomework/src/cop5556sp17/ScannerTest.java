@@ -288,6 +288,21 @@ public class ScannerTest {
 		scanner.scan();
 		System.out.println(scanner.tokens.size());
 		
+//		for(int i=0;i<scanner.tokens.size();i++){
+//			System.out.println(scanner.tokens.get(i).getText());
+//			System.out.println(scanner.tokens.get(i).length);
+//			System.out.println(scanner.tokens.get(i).kind);
+//			System.out.println(scanner.tokens.get(i).pos);
+//			System.out.println(scanner.tokens.get(i).getLinePos().toString());
+//			System.out.println("");
+//		}	
+	}
+	@Test
+	public void testSlashTSlashR() throws IllegalCharException, IllegalNumberException{
+		String input = "\t gasa \t \r dsad     \t \r\t\n\t \r";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		
 		for(int i=0;i<scanner.tokens.size();i++){
 			System.out.println(scanner.tokens.get(i).getText());
 			System.out.println(scanner.tokens.get(i).length);
@@ -295,7 +310,6 @@ public class ScannerTest {
 			System.out.println(scanner.tokens.get(i).pos);
 			System.out.println(scanner.tokens.get(i).getLinePos().toString());
 			System.out.println("");
-		}	
+		}
 	}
-	
 }
