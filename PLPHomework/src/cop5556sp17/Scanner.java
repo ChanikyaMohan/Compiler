@@ -284,7 +284,7 @@ public class Scanner {
 	            	}
 	            } break;
 	            case AFTER_OR: {
-	            	if(pos<length-2 && chars.charAt(pos) == '-' && chars.charAt(pos+1) == '>'){
+	            	if(pos<length-1 && chars.charAt(pos) == '-' && chars.charAt(pos+1) == '>'){
 	            		tokens.add(new Token(Kind.BARARROW, startPos, 3));pos=pos+2;
 	            		state = State.START;
 	            	} else {
@@ -355,7 +355,7 @@ public class Scanner {
         }  break;
         
 		case AFTER_MINUS: {
-        		tokens.add(new Token(Kind.MINUS, startPos, 1));pos++;
+        		tokens.add(new Token(Kind.MINUS, startPos, 1));
         		state = State.START;
         } break;
         
@@ -366,12 +366,12 @@ public class Scanner {
         } 
         
 		case AFTER_NOT: {
-        		tokens.add(new Token(Kind.NOT, startPos, 1));pos++;
+        		tokens.add(new Token(Kind.NOT, startPos, 1));
         		state = State.START;
         } break;
         
 		case AFTER_DIV: {
-        		tokens.add(new Token(Kind.DIV, startPos, 1));pos++;
+        		tokens.add(new Token(Kind.DIV, startPos, 1));
         		state = State.START;
         } break;
         case COMMENT: {
@@ -379,7 +379,7 @@ public class Scanner {
         	//its not a problem
         } break;
         case AFTER_OR: {
-        		tokens.add(new Token(Kind.OR, startPos, 1));pos++;
+        		tokens.add(new Token(Kind.OR, startPos, 1));
         		state = State.START;
         } break;
         case AFTER_LESS: {
