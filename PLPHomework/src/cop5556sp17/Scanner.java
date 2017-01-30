@@ -1,6 +1,7 @@
 package cop5556sp17;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Scanner {
 	/**
@@ -97,7 +98,12 @@ public class Scanner {
 		//returns a LinePos object representing the line and column of this Token
 		LinePos getLinePos(){
 			//TODO IMPLEMENT THIS
-			return null;
+			int idx;
+			idx = Collections.binarySearch(lineStartPos, pos);
+			if(idx < 0){
+				idx=-1*(idx+1)-1;
+			}
+			return new LinePos(idx+1, pos-lineStartPos.get(idx)+1);
 		}
 
 		Token(Kind kind, int pos, int length) {
@@ -124,11 +130,11 @@ public class Scanner {
 
 	 
 
-
+	ArrayList<Integer> lineStartPos;
 	Scanner(String chars) {
 		this.chars = chars;
 		tokens = new ArrayList<Token>();
-
+		lineStartPos = new ArrayList<Integer>();
 
 	}
 
@@ -147,6 +153,7 @@ public class Scanner {
 	    int length = chars.length();
 	    State state = State.START;
 	    int startPos = 0;
+	    lineStartPos.add(0);
 	    int ch;
 	    while (pos < length) {
 	        ch = pos < length ? chars.charAt(pos) : -1;
@@ -167,6 +174,7 @@ public class Scanner {
 	                    case '+': {tokens.add(new Token(Kind.PLUS, startPos, 1));pos++;} break;
 	                    case '*': {tokens.add(new Token(Kind.TIMES, startPos, 1));pos++;} break;
 	                    case '%': {tokens.add(new Token(Kind.MOD, startPos, 1));pos++;} break;
+	                    case '\n': {pos++;lineStartPos.add(pos);} break;
 	                    case '/': {state = State.AFTER_DIV;pos++;} break;
 	                    case '-': {state = State.AFTER_MINUS;pos++;} break;
 	                    case '=': {state = State.AFTER_EQ;pos++;}break;
@@ -213,14 +221,16 @@ public class Scanner {
 		            		  if(ktext.equals(subident)){
 		            			  reservedFound = 1;
 		            			  tokens.add(new Token(k,startPos,pos - startPos));
+		            			  state = State.START;
 		            			  break;
 		            		  }
 		            	  }
 		            	  //System.out.println(reservedFound);
 		            	  if(reservedFound == 0){
-		            		  tokens.add(new Token(Kind.IDENT, startPos, pos - startPos));	              
+		            		  tokens.add(new Token(Kind.IDENT, startPos, pos - startPos));
+		            		  state = State.START;
 		            	  }
-		            	  state = State.START;
+		            	  
 		              }
 	            }  break;
 	            case AFTER_MINUS: {
@@ -263,6 +273,8 @@ public class Scanner {
 	            	if(chars.charAt(pos)  == '\n'){
 	            		//TODO line number
 	            		//lineNumber++;
+	            		lineStartPos.add(pos);
+	            		pos++;
 	            	} else if(pos<length-2 && chars.charAt(pos) == '*' && chars.charAt(pos+1)=='/'){
 	            		pos = pos + 2;
 	            		state = State.START;
@@ -440,7 +452,7 @@ public class Scanner {
 	 */
 	public LinePos getLinePos(Token t) {
 		//TODO IMPLEMENT THIS
-		return null;
+		return t.getLinePos();
 	}
 
 

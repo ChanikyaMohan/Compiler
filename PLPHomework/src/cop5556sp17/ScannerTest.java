@@ -280,4 +280,19 @@ public class ScannerTest {
 		}
 	}
 	
+	@Test
+	public void testNewLine() throws IllegalCharException, IllegalNumberException{
+		String input = "9AB_C8 ;; 09<-;  ++++integer grey\n intege gray xlo xloc \ntr true <=== /* 1 \n2 /*\n abc 3 */ !=999 _9AD";
+		//create and initialize the scanner
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		System.out.println(scanner.tokens.size());
+		
+		for(int i=0;i<scanner.tokens.size();i++){
+			System.out.println(scanner.tokens.get(i).getText());
+			System.out.println(scanner.tokens.get(i).kind);
+			System.out.println(scanner.tokens.get(i).getLinePos().toString());
+		}	
+	}
+	
 }
