@@ -235,7 +235,7 @@ public class Scanner {
 	            }  break;
 	            case AFTER_MINUS: {
 	            	if(chars.charAt(pos) == '>'){
-	            		tokens.add(new Token(Kind.ARROW, startPos, pos - startPos));pos++;
+	            		tokens.add(new Token(Kind.ARROW, startPos, 2));pos++;
 	            		state = State.START;
 	            	} else {
 	            		tokens.add(new Token(Kind.MINUS, startPos, 1));pos++;
@@ -244,7 +244,7 @@ public class Scanner {
 	            } break;
 	            case AFTER_EQ: {
 	            	if(chars.charAt(pos) == '='){
-	            		tokens.add(new Token(Kind.EQUAL, startPos, pos - startPos));pos++;
+	            		tokens.add(new Token(Kind.EQUAL, startPos, 2));pos++;
 	            		state = State.START;
 	            	} else {
 	            		// TODO implement throwing an error if we get only '='
@@ -254,7 +254,7 @@ public class Scanner {
 	            } break;
 	            case AFTER_NOT: {
 	            	if(chars.charAt(pos) == '='){
-	            		tokens.add(new Token(Kind.NOTEQUAL, startPos, pos - startPos));pos++;
+	            		tokens.add(new Token(Kind.NOTEQUAL, startPos, 2));pos++;
 	            		state = State.START;
 	            	} else {
 	            		tokens.add(new Token(Kind.NOT, startPos, 1));pos++;
@@ -273,8 +273,9 @@ public class Scanner {
 	            	if(chars.charAt(pos)  == '\n'){
 	            		//TODO line number
 	            		//lineNumber++;
-	            		lineStartPos.add(pos);
 	            		pos++;
+	            		lineStartPos.add(pos);
+	            		
 	            	} else if(pos<length-2 && chars.charAt(pos) == '*' && chars.charAt(pos+1)=='/'){
 	            		pos = pos + 2;
 	            		state = State.START;
@@ -284,19 +285,19 @@ public class Scanner {
 	            } break;
 	            case AFTER_OR: {
 	            	if(pos<length-1 && chars.charAt(pos) == '-' && chars.charAt(pos+1) == '>'){
-	            		tokens.add(new Token(Kind.BARARROW, startPos, pos - startPos));pos=pos+2;
+	            		tokens.add(new Token(Kind.BARARROW, startPos, 3));pos=pos+2;
 	            		state = State.START;
 	            	} else {
-	            		tokens.add(new Token(Kind.OR, startPos, pos - startPos));
+	            		tokens.add(new Token(Kind.OR, startPos, 1));
 	            		state = State.START;
 	            	}
 	            } break;
 	            case AFTER_LESS: {
 	            	if(chars.charAt(pos) == '-'){
-	            		tokens.add(new Token(Kind.ASSIGN, startPos, pos - startPos));pos++;
+	            		tokens.add(new Token(Kind.ASSIGN, startPos, 2));pos++;
 	            		state = State.START;
 	            	} else if(chars.charAt(pos) == '=') {
-	            		tokens.add(new Token(Kind.LE, startPos, pos - startPos));pos++;
+	            		tokens.add(new Token(Kind.LE, startPos, 2));pos++;
 	            		state = State.START;
 	            	} else {
 	            		tokens.add(new Token(Kind.LT, startPos, pos - startPos));
@@ -305,10 +306,10 @@ public class Scanner {
 	            } break;
 	            case AFTER_GREAT: {
 	            	if(chars.charAt(pos) == '='){
-	            		tokens.add(new Token(Kind.GE, startPos, pos - startPos));pos++;
+	            		tokens.add(new Token(Kind.GE, startPos,2));pos++;
 	            		state = State.START;
 	            	} else {
-	            		tokens.add(new Token(Kind.GT, startPos, pos - startPos));
+	            		tokens.add(new Token(Kind.GT, startPos,1));
 	            		state = State.START;
 	            	}
 	            } break;
@@ -378,15 +379,15 @@ public class Scanner {
         	//its not a problem
         } break;
         case AFTER_OR: {
-        		tokens.add(new Token(Kind.OR, startPos, pos - startPos));pos++;
+        		tokens.add(new Token(Kind.OR, startPos, 1));pos++;
         		state = State.START;
         } break;
         case AFTER_LESS: {
-        		tokens.add(new Token(Kind.LT, startPos, pos - startPos));
+        		tokens.add(new Token(Kind.LT, startPos, 1));
         		state = State.START;
         } break;
         case AFTER_GREAT: {
-        		tokens.add(new Token(Kind.GT, startPos, pos - startPos));
+        		tokens.add(new Token(Kind.GT, startPos, 1));
         		state = State.START;
         } break;
         default:  assert false;
@@ -402,7 +403,7 @@ public class Scanner {
 	public int skipWhiteSpace(int pos) {
 		// TODO Auto-generated method stub
 		char ch = chars.charAt(pos);
-		while(Character.isWhitespace(ch)){
+		while(Character.isWhitespace(ch) && ch!= '\n'){
 			pos++;
 			if(pos<chars.length()){
 				ch = chars.charAt(pos);				
