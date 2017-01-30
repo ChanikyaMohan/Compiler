@@ -163,7 +163,7 @@ public class Scanner {
 	                ch = pos < length ? chars.charAt(pos) : -1;
 	                startPos = pos;
 	                switch (ch) {
-	                    //case -1: {tokens.add(new Token(Kind.EOF, pos, 0)); pos++;}  break;
+	                    case -1: {tokens.add(new Token(Kind.EOF, pos, 0)); pos++;}  break;
 	                    case ';': {tokens.add(new Token(Kind.SEMI, startPos, 1));pos++;} break;
 	                    case ',': {tokens.add(new Token(Kind.COMMA, startPos, 1));pos++;} break;
 	                    case '(': {tokens.add(new Token(Kind.LPAREN, startPos, 1));pos++;} break;
@@ -257,7 +257,7 @@ public class Scanner {
 	            		tokens.add(new Token(Kind.NOTEQUAL, startPos, 2));pos++;
 	            		state = State.START;
 	            	} else {
-	            		tokens.add(new Token(Kind.NOT, startPos, 1));pos++;
+	            		tokens.add(new Token(Kind.NOT, startPos, 1));
 	            		state = State.START;
 	            	}
 	            } break;
@@ -362,7 +362,7 @@ public class Scanner {
 		case AFTER_EQ: {
         		// TODO implement throwing an error if we get only '='
         		throw new IllegalCharException(
-                        "illegal char " +chars.charAt(pos-1)+" at pos "+pos);
+                        "illegal char " +chars.charAt(pos-1)+" at pos "+ (pos-1));
         } 
         
 		case AFTER_NOT: {
