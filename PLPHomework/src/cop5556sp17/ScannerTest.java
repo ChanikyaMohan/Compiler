@@ -118,9 +118,7 @@ public class ScannerTest {
 		
 		Scanner.Token token = scanner.nextToken();
 		Scanner.Token token1 = scanner.nextToken();
-		
-
-		
+			
 		//System.out.println(token.kind);
 		//System.out.println(token.pos);
 		//System.out.println(token.length);
@@ -347,28 +345,35 @@ public class ScannerTest {
 	}
 	@Test
 	public void testgetText() throws IllegalCharException, IllegalNumberException{
-		String input = "|-> <- == + - * / % () {} ! != | & == */";
+		String input = "|-> {} ! !=  == */ | + -";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		
 		Scanner.Token token = scanner.nextToken();
-		assertEquals(Kind.BARARROW, token.kind);
-		assertEquals(0, token.pos);
 		assertEquals("|->", token.getText());
 		
 		Scanner.Token token1 = scanner.nextToken();
-		assertEquals("<-", token1.getText());
+		assertEquals("{", token1.getText());
 		
 		Scanner.Token token2 = scanner.nextToken();
-		assertEquals("==", token2.getText());
+		assertEquals("}", token2.getText());
 		
 		Scanner.Token token3 = scanner.nextToken();
-		assertEquals("+", token3.getText());
+		assertEquals("!", token3.getText());
 		
 		Scanner.Token token4 = scanner.nextToken();
-		assertEquals("-", token4.getText());
+		assertEquals("!=", token4.getText());
 		
 		Scanner.Token token5 = scanner.nextToken();
-		assertEquals("*", token5.getText());
+		assertEquals("==", token5.getText());
+		
+		Scanner.Token token6 = scanner.nextToken();
+		assertEquals("*", token6.getText());
+		
+		Scanner.Token token7 = scanner.nextToken();
+		assertEquals("/", token7.getText());
+		
+		Scanner.Token token8 = scanner.nextToken();
+		assertEquals("|", token8.getText());
 	}
 }
