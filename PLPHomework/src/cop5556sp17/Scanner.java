@@ -98,12 +98,12 @@ public class Scanner {
 		//returns a LinePos object representing the line and column of this Token
 		LinePos getLinePos(){
 			//TODO IMPLEMENT THIS
-			int idx;
-			idx = Collections.binarySearch(lineStartPos, pos);
-			if(idx < 0){
-				idx=-1*(idx+1)-1;
+			int index = Collections.binarySearch(startIndexofEachNewLine, pos);
+			if(index < 0){
+				index=-1*(index+1)-1;
 			}
-			return new LinePos(idx, pos-lineStartPos.get(idx));
+			int posinLine = pos-startIndexofEachNewLine.get(index);
+			return new LinePos(index, posinLine);
 		}
 
 		Token(Kind kind, int pos, int length) {
@@ -130,11 +130,11 @@ public class Scanner {
 
 	 
 
-	ArrayList<Integer> lineStartPos;
+
 	Scanner(String chars) {
 		this.chars = chars;
 		tokens = new ArrayList<Token>();
-		lineStartPos = new ArrayList<Integer>();
+		startIndexofEachNewLine = new ArrayList<Integer>();
 
 	}
 
@@ -153,7 +153,7 @@ public class Scanner {
 	    int length = chars.length();
 	    State state = State.START;
 	    int startPos = 0;
-	    lineStartPos.add(0);
+	    startIndexofEachNewLine.add(0);
 	    int inStartEOFFlag = 0;
 	    int ch;
 	    while (pos < length) {
@@ -175,7 +175,7 @@ public class Scanner {
 	                    case '+': {tokens.add(new Token(Kind.PLUS, startPos, 1));pos++;} break;
 	                    case '*': {tokens.add(new Token(Kind.TIMES, startPos, 1));pos++;} break;
 	                    case '%': {tokens.add(new Token(Kind.MOD, startPos, 1));pos++;} break;
-	                    case '\n': {pos++;lineStartPos.add(pos);} break;
+	                    case '\n': {pos++;startIndexofEachNewLine.add(pos);} break;
 	                    case '/': {state = State.AFTER_DIV;pos++;} break;
 	                    case '-': {state = State.AFTER_MINUS;pos++;} break;
 	                    case '=': {state = State.AFTER_EQ;pos++;}break;
@@ -266,7 +266,7 @@ public class Scanner {
 	            	if(chars.charAt(pos) == '*'){
 	            		state = State.COMMENT;pos++;
 	            	} else {
-	            		tokens.add(new Token(Kind.DIV, startPos, 1));pos++;
+	            		tokens.add(new Token(Kind.DIV, startPos, 1));
 	            		state = State.START;
 	            	}
 	            } break;
@@ -275,7 +275,7 @@ public class Scanner {
 	            		//TODO line number
 	            		//lineNumber++;
 	            		pos++;
-	            		lineStartPos.add(pos);
+	            		startIndexofEachNewLine.add(pos);
 	            		
 	            	} else if(pos<length-2 && chars.charAt(pos) == '*' && chars.charAt(pos+1)=='/'){
 	            		pos = pos + 2;
@@ -419,7 +419,7 @@ public class Scanner {
 	}
 
 
-
+	final ArrayList<Integer> startIndexofEachNewLine;
 	final ArrayList<Token> tokens;
 	final String chars;
 	int tokenNum;

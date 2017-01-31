@@ -1,7 +1,6 @@
 package cop5556sp17;
 
-import static cop5556sp17.Scanner.Kind;
-
+import static cop5556sp17.Scanner.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -282,34 +281,94 @@ public class ScannerTest {
 	
 	@Test
 	public void testNewLine() throws IllegalCharException, IllegalNumberException{
-		String input = "9AB_C8\n ;; 09<-;  ++++integer grey\n intege gray xlo xloc \ntr true <=== |-> |/* 1 \n2 /*\n abc 3 */ !=999 _9AD 4088";
+		String input = "cha\n ;**+ /22<-<-;;; width height\n\n url image fasle \ntrue !- |- |-> |/* 1 \n2 /*\n innside comment 88 69*/ --==  4088";
 		//create and initialize the scanner
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
-		System.out.println(scanner.tokens.size());
-		
-//		for(int i=0;i<scanner.tokens.size();i++){
-//			System.out.println(scanner.tokens.get(i).getText());
-//			System.out.println(scanner.tokens.get(i).length);
-//			System.out.println(scanner.tokens.get(i).kind);
-//			System.out.println(scanner.tokens.get(i).pos);
-//			System.out.println(scanner.tokens.get(i).getLinePos().toString());
-//			System.out.println("");
-//		}	
+		//System.out.println(scanner.tokens.size());
+		Scanner.Token t;
+		while((t = scanner.nextToken()) != null){
+			System.out.println(t.getText());
+			System.out.println(t.length);
+			System.out.println(t.kind);
+			System.out.println(t.pos);
+			System.out.println(t.getLinePos().toString());
+			System.out.println("");
+		}	
 	}
 	@Test
 	public void testSlashTSlashR() throws IllegalCharException, IllegalNumberException{
 		String input = "\t gasa \t \r dsad     \t \r\t\n\t \r";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
-		
-		for(int i=0;i<scanner.tokens.size();i++){
-			System.out.println(scanner.tokens.get(i).getText());
-			System.out.println(scanner.tokens.get(i).length);
-			System.out.println(scanner.tokens.get(i).kind);
-			System.out.println(scanner.tokens.get(i).pos);
-			System.out.println(scanner.tokens.get(i).getLinePos().toString());
+		Scanner.Token t;
+		while((t = scanner.nextToken()) != null){
+			System.out.println(t.getText());
+			System.out.println(t.length);
+			System.out.println(t.kind);
+			System.out.println(t.pos);
+			System.out.println(t.getLinePos().toString());
 			System.out.println("");
 		}
+	}
+	@Test
+	public void testRandomString() throws IllegalCharException, IllegalNumberException{
+		String input = "i;,++==-!->||->\nadcb\njh*we***interger\t\r<-->\n<<<=gray;;%/*comm\nent*/";
+		Scanner scanner = new Scanner(input);
+		//thrown.expect(IllegalCharException.class);
+		scanner.scan();	
+		Scanner.Token t;
+		while((t = scanner.nextToken()) != null){
+			System.out.println(t.getText());
+			System.out.println(t.length);
+			System.out.println(t.kind);
+			System.out.println(t.pos);
+			System.out.println(t.getLinePos().toString());
+			System.out.println("");	
+		}
+	}
+	@Test
+	public void testNullCharException() throws IllegalCharException, IllegalNumberException {
+		String input = "chandu/n88'#";
+		Scanner scanner = new Scanner(input);
+		thrown.expect(IllegalCharException.class);
+		scanner.scan();
+	}
+	@Test
+	public void testRandomComment() throws IllegalCharException, IllegalNumberException{
+		String input = " /* this is comment** */ /*dfdfds";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token = scanner.nextToken();
+		
+		assertEquals(Kind.EOF, token.kind);
+		assertEquals(33, token.pos);
+	}
+	@Test
+	public void testgetText() throws IllegalCharException, IllegalNumberException{
+		String input = "|-> <- == + - * / % () {} ! != | & == */";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token = scanner.nextToken();
+		assertEquals(Kind.BARARROW, token.kind);
+		assertEquals(0, token.pos);
+		assertEquals("|->", token.getText());
+		
+		Scanner.Token token1 = scanner.nextToken();
+		assertEquals("<-", token1.getText());
+		
+		Scanner.Token token2 = scanner.nextToken();
+		assertEquals("==", token2.getText());
+		
+		Scanner.Token token3 = scanner.nextToken();
+		assertEquals("+", token3.getText());
+		
+		Scanner.Token token4 = scanner.nextToken();
+		assertEquals("-", token4.getText());
+		
+		Scanner.Token token5 = scanner.nextToken();
+		assertEquals("*", token5.getText());
 	}
 }
