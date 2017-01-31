@@ -326,6 +326,20 @@ public class ScannerTest {
 		}
 	}
 	@Test
+	public void testContinuosWhiteSpace() throws IllegalCharException, IllegalNumberException{
+		String input = "abc        ";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token = scanner.nextToken();
+		Scanner.Token token2 = scanner.nextToken();
+		
+		assertEquals(Kind.IDENT, token.kind);
+		assertEquals(0,token.pos);
+		assertEquals(Kind.EOF, token2.kind);
+		assertEquals(11, token2.pos);
+	}
+	@Test
 	public void testNullCharException() throws IllegalCharException, IllegalNumberException {
 		String input = "chandu/n88'#";
 		Scanner scanner = new Scanner(input);
@@ -376,4 +390,5 @@ public class ScannerTest {
 		Scanner.Token token8 = scanner.nextToken();
 		assertEquals("|", token8.getText());
 	}
+
 }

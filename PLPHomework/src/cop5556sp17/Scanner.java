@@ -149,7 +149,7 @@ public class Scanner {
 	 */
 	public Scanner scan() throws IllegalCharException, IllegalNumberException {
 		int pos = 0; 
-		//TODO comment
+		//TODO IMPLEMENT THIS
 	    int length = chars.length();
 	    State state = State.START;
 	    int startPos = 0;
@@ -377,7 +377,7 @@ public class Scanner {
         } break;
         case COMMENT: {
         	//do nothing
-        	//its not a problem
+        	//breaking out when in comment is not a problem
         } break;
         case AFTER_OR: {
         		tokens.add(new Token(Kind.OR, startPos, 1));
@@ -397,7 +397,6 @@ public class Scanner {
 		
 		if(inStartEOFFlag == 0){
 			tokens.add(new Token(Kind.EOF,pos,0));
-			
 		}
 		return this;  
 	}
