@@ -245,6 +245,9 @@ public class Parser {
 		} else if(t.isKind(OP_WIDTH) || t.isKind(OP_HEIGHT) || t.isKind(KW_SCALE)){
 			consume();
 			arg();
+		} else {
+			//TODO you will want to provide a more useful error message
+			throw new SyntaxException("illegal factor");
 		}
 	}
 
@@ -258,7 +261,10 @@ public class Parser {
 				expression();
 			}
 			match(RPAREN);
-		} 
+		} else {
+			//TODO you will want to provide a more useful error message
+			throw new SyntaxException("illegal factor");
+		}
 	}
 
 	/**
