@@ -50,5 +50,78 @@ public class ParserTest {
 		Parser parser = new Parser(new Scanner(input).scan());
 		parser.parse();
 	}
+	
+	@Test
+	public void testProgram1() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog1 integer a, boolean b, url i{}";
+		Parser parser = new Parser(new Scanner(input).scan());
+		parser.parse();
+	}
+	
+	@Test
+	public void testProgramErr() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog0 {a,b}";
+		Parser parser = new Parser(new Scanner(input).scan());
+		thrown.expect(Parser.SyntaxException.class);
+		parser.parse();
+		
+	}
 
+	@Test
+	public void testProgramErr1() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog0 {a|->b}";
+		Parser parser = new Parser(new Scanner(input).scan());
+		thrown.expect(Parser.SyntaxException.class);
+		parser.parse();
+	}
+	
+	@Test
+	public void testProgramErr2() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog0 a|->b}";
+		Parser parser = new Parser(new Scanner(input).scan());
+		thrown.expect(Parser.SyntaxException.class);
+		parser.parse();
+	}
+	
+	@Test
+	public void testProgramNoErr2() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog0 {a|->b;}";
+		Parser parser = new Parser(new Scanner(input).scan());
+		//thrown.expect(Parser.SyntaxException.class);
+		parser.parse();
+	}
+	
+	@Test
+	public void testExpression0() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "a+b;";
+		Parser parser = new Parser(new Scanner(input).scan());
+		parser.expression();
+		
+		input = "a+b-3*4+z/2%r;";
+		parser = new Parser(new Scanner(input).scan());
+		parser.expression();
+	}
+	
+	@Test
+	public void testExpressionErr() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog {while(a,b){}}";
+		Parser parser = new Parser(new Scanner(input).scan());
+		thrown.expect(Parser.SyntaxException.class);
+		parser.program();
+	}
+	
+	@Test
+	public void testExpressionErr1() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog {if(a+b-3,4+z/2%r){}}";
+		Parser parser = new Parser(new Scanner(input).scan());
+		thrown.expect(Parser.SyntaxException.class);
+		parser.program();
+	}
+	@Test
+	public void testExpressionErr2() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog {blur -> a; if(alb-3*4++z/2%r){} }";
+		Parser parser = new Parser(new Scanner(input).scan());
+		thrown.expect(Parser.SyntaxException.class);
+		parser.program();
+	}
 }

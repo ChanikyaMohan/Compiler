@@ -50,9 +50,31 @@ public class Parser {
 		matchEOF();
 		return;
 	}
-
+	
+	void program() throws SyntaxException {
+		//TODO
+		System.out.println("program");
+		match(IDENT);
+		if (t.isKind(LBRACE)){
+			block();
+		}
+		else if(t.isKind(KW_URL) || t.isKind(KW_FILE) || t.isKind(KW_INTEGER) || t.isKind(KW_BOOLEAN)){
+			paramDec();
+			while(t.isKind(COMMA)){
+				consume();
+				System.out.println("Comma consumed");
+				paramDec();
+			}
+			block();
+		} else {
+			//TODO you will want to provide a more useful error message
+			throw new SyntaxException("saw: " +t.kind +"expected: " +"Identifier or Paramdec");
+		}
+	}
+	
 	void expression() throws SyntaxException {
 		//TODO
+		System.out.println("Expression");
 		term();
 		while (t.isKind(LT ) || t.isKind(LE) || t.isKind(GT)|| t.isKind(GE) || t.isKind(EQUAL) || t.isKind(NOTEQUAL)) 
 		{
@@ -63,6 +85,7 @@ public class Parser {
 	
 	void term() throws SyntaxException {
 		//TODO
+		System.out.println("term");
 		elem();
 		while (t.isKind(PLUS) || t.isKind(MINUS) || t.isKind(OR))
 		 {
@@ -73,6 +96,7 @@ public class Parser {
 
 	void elem() throws SyntaxException {
 		//TODO
+		System.out.println("elem");
 		factor();
 		while (t.isKind(TIMES) || t.isKind(DIV) || t.isKind(AND) || t.isKind(MOD))
 		 {
@@ -82,6 +106,7 @@ public class Parser {
 	}
 
 	void factor() throws SyntaxException {
+		System.out.println("factor");
 		Kind kind = t.kind;
 		switch (kind) {
 		case IDENT: case INT_LIT: case KW_TRUE: case KW_FALSE: 	case KW_SCREENWIDTH: case KW_SCREENHEIGHT:{
@@ -100,6 +125,7 @@ public class Parser {
 
 	void block() throws SyntaxException {
 		//TODO
+		System.out.println("block");
 		if(t.isKind(LBRACE)){
 			consume();
 			while(!t.isKind(RBRACE)){
@@ -116,27 +142,9 @@ public class Parser {
 		}
 	}
 
-	void program() throws SyntaxException {
-		//TODO
-		match(IDENT);
-		if (t.isKind(LBRACE)){
-			block();
-		}
-		else if(t.isKind(KW_URL) || t.isKind(KW_FILE) || t.isKind(KW_INTEGER) || t.isKind(KW_BOOLEAN)){
-			paramDec();
-			while(t.isKind(COMMA)){
-				consume();
-				paramDec();
-			}
-			block();
-		} else {
-			//TODO you will want to provide a more useful error message
-			throw new SyntaxException("illegal factor");
-		}
-	}
-
 	void paramDec() throws SyntaxException {
 		//TODO
+		System.out.println("paramdec");
 		if(t.isKind(KW_URL) || t.isKind(KW_FILE) || t.isKind(KW_INTEGER) || t.isKind(KW_BOOLEAN)){
 			consume();
 		} else {
@@ -148,6 +156,7 @@ public class Parser {
 
 	void dec() throws SyntaxException {
 		//TODO
+		System.out.println("dec");
 		if(t.isKind(KW_INTEGER) || t.isKind(KW_BOOLEAN) || t.isKind(KW_IMAGE) || t.isKind(KW_FRAME)){
 			consume();
 		} else {
@@ -159,6 +168,7 @@ public class Parser {
 
 	void statement() throws SyntaxException {
 		//TODO
+		System.out.println("statement");
 		if(t.isKind(OP_SLEEP)){
 			match(OP_SLEEP);
 			expression();
@@ -173,10 +183,12 @@ public class Parser {
 			} else {
 				chain();
 			}
+			System.out.println("Semi matched");
 			match(SEMI);
 		} else {
 			if (t.isKind(OP_BLUR) || t.isKind(OP_GRAY) || t.isKind(OP_CONVOLVE) || t.isKind(KW_SHOW) || t.isKind(KW_HIDE) || t.isKind(KW_MOVE) ||t.isKind(KW_XLOC) || t.isKind(KW_YLOC) || t.isKind(OP_WIDTH) || t.isKind(OP_HEIGHT) || t.isKind(KW_SCALE)){
 				chain();
+				System.out.println("Semi matched");
 				match(SEMI);
 			}
 			else{
@@ -186,6 +198,7 @@ public class Parser {
 	}
 	
 	void ifStatement() throws SyntaxException {
+		System.out.println("ifstatement");
 		match(KW_IF);
 		if(t.isKind(LPAREN)){
 			consume();
@@ -199,12 +212,14 @@ public class Parser {
 	}
 	
 	void assign() throws SyntaxException {
+		System.out.println("assign");
 		match(IDENT);
 		match(ASSIGN);
 		expression();
 	}
 	
 	void whileStatement() throws SyntaxException {
+		System.out.println("whilestaement");
 		match(KW_WHILE);
 		if(t.isKind(LPAREN)){
 			consume();
@@ -219,6 +234,7 @@ public class Parser {
 	
 	void chain() throws SyntaxException {
 		//TODO
+		System.out.println("chain");
 		chainElem();
 		arrowOp();
 		chainElem();
@@ -229,12 +245,15 @@ public class Parser {
 	}
 	
 	void arrowOp() throws SyntaxException {
+		System.out.println("arrowop");
 		match(ARROW, BARARROW);
 	}
 	
 	void chainElem() throws SyntaxException {
 		//TODO
+		System.out.println("chain elem");
 		if(t.isKind(IDENT)){
+			System.out.println("identifier consumed");
 			consume();	
 		} else if(t.isKind(OP_BLUR ) || t.isKind(OP_GRAY) || t.isKind(OP_CONVOLVE)){
 			consume();
@@ -253,6 +272,7 @@ public class Parser {
 
 	void arg() throws SyntaxException {
 		//TODO
+		System.out.println("arg");
 		if(t.isKind(LPAREN)){
 			consume();
 			expression();
@@ -261,10 +281,8 @@ public class Parser {
 				expression();
 			}
 			match(RPAREN);
-		} else {
-			//TODO you will want to provide a more useful error message
-			throw new SyntaxException("illegal factor");
 		}
+		// don't throw error here
 	}
 
 	/**
@@ -275,6 +293,7 @@ public class Parser {
 	 * @throws SyntaxException
 	 */
 	private Token matchEOF() throws SyntaxException {
+		System.out.println("EOF match");
 		if (t.isKind(EOF)) {
 			return t;
 		}
@@ -317,7 +336,7 @@ public class Parser {
 				return consume();
 			}
 		}
-		throw new SyntaxException("saw " + t.kind + "expected " + kinds);
+		throw new SyntaxException("saw: " + t.kind + "expected: " + kinds.toString());
 	}
 
 	/**
