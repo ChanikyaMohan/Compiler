@@ -3,6 +3,8 @@ package cop5556sp17;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import cop5556sp17.Scanner.Kind;
+
 public class Scanner {
 	/**
 	 * Kind enum
@@ -124,6 +126,11 @@ public class Scanner {
 			//TODO IMPLEMENT THIS
 			int val = Integer.parseInt(chars.substring(pos, pos+length));
 			return val;
+		}
+
+		public boolean isKind(Kind kind) {
+			// TODO Auto-generated method stub
+			return (kind == this.kind);
 		}
 		
 	}
