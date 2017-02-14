@@ -92,6 +92,14 @@ public class ParserTest {
 	}
 	
 	@Test
+	public void testProgramNoErr3() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog integer i,url u,boolean b {integer i, boolean b image k sleep a*b+k;";
+		Parser parser = new Parser(new Scanner(input).scan());
+		thrown.expect(Parser.SyntaxException.class);
+		parser.parse();
+	}
+	
+	@Test
 	public void testExpression0() throws IllegalCharException, IllegalNumberException, SyntaxException{
 		String input = "a+b;";
 		Parser parser = new Parser(new Scanner(input).scan());
@@ -107,7 +115,7 @@ public class ParserTest {
 		String input = "prog {while(a,b){}}";
 		Parser parser = new Parser(new Scanner(input).scan());
 		thrown.expect(Parser.SyntaxException.class);
-		parser.program();
+		parser.parse();
 	}
 	
 	@Test
@@ -115,13 +123,44 @@ public class ParserTest {
 		String input = "prog {if(a+b-3,4+z/2%r){}}";
 		Parser parser = new Parser(new Scanner(input).scan());
 		thrown.expect(Parser.SyntaxException.class);
-		parser.program();
+		parser.parse();
 	}
 	@Test
 	public void testExpressionErr2() throws IllegalCharException, IllegalNumberException, SyntaxException{
 		String input = "prog {blur -> a; if(alb-3*4++z/2%r){} }";
 		Parser parser = new Parser(new Scanner(input).scan());
 		thrown.expect(Parser.SyntaxException.class);
-		parser.program();
+		parser.parse();
+	}
+	
+	@Test
+	public void testAssign() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog { blur -> a; c <- b+c; }";
+		Parser parser = new Parser(new Scanner(input).scan());
+		parser.parse();
+	}
+	
+	@Test
+	public void testAssignErr() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog { blur -> a; c <- +c; }";
+		Parser parser = new Parser(new Scanner(input).scan());
+		thrown.expect(Parser.SyntaxException.class);
+		parser.parse();
+	}
+	
+	@Test
+	public void testAssignErr1() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog { blur -> a;  <- b+c; }";
+		Parser parser = new Parser(new Scanner(input).scan());
+		thrown.expect(Parser.SyntaxException.class);
+		parser.parse();
+	}
+	
+	@Test
+	public void testAssignErr2() throws IllegalCharException, IllegalNumberException, SyntaxException{
+		String input = "prog { blur -> a;  a <- ; }";
+		Parser parser = new Parser(new Scanner(input).scan());
+		thrown.expect(Parser.SyntaxException.class);
+		parser.parse();
 	}
 }

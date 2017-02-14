@@ -62,7 +62,7 @@ public class Parser {
 			paramDec();
 			while(t.isKind(COMMA)){
 				consume();
-				System.out.println("Comma consumed");
+				//System.out.println("Comma consumed");
 				paramDec();
 			}
 			block();
@@ -138,7 +138,7 @@ public class Parser {
 			match(RBRACE);
 		} else {
 			//TODO you will want to provide a more useful error message
-			throw new SyntaxException("illegal factor");
+			throw new SyntaxException("illegal token saw: " +t.kind +"expected: " +"block");
 		}
 	}
 
@@ -149,7 +149,7 @@ public class Parser {
 			consume();
 		} else {
 			//TODO you will want to provide a more useful error message
-			throw new SyntaxException("illegal factor");
+			throw new SyntaxException("illegal token saw: " +t.kind +"expected: " +"param dec");
 		}
 		match(IDENT);
 	}
@@ -178,7 +178,7 @@ public class Parser {
 		} else if(t.isKind(KW_IF)){
 			ifStatement();
 		} else if(t.isKind(IDENT)){
-			if (scanner.peek().isKind(ASSIGN)){
+			if (scanner.peek().kind.toString() == "ASSIGN"){
 				assign();
 			} else {
 				chain();
@@ -192,7 +192,7 @@ public class Parser {
 				match(SEMI);
 			}
 			else{
-				throw new SyntaxException("illegal statement"+t.kind);
+				throw new SyntaxException("illegal token"+t.kind+"expected: " +" a statements");
 			}
 		}
 	}
@@ -207,7 +207,7 @@ public class Parser {
 			block();
 		} else {
 			//TODO you will want to provide a more useful error message
-			throw new SyntaxException("illegal factor");
+			throw new SyntaxException("illegal token"+t.kind+"expected: " +" if statement");
 		}
 	}
 	
@@ -228,7 +228,7 @@ public class Parser {
 			block();
 		} else {
 			//TODO you will want to provide a more useful error message
-			throw new SyntaxException("illegal factor");
+			throw new SyntaxException("illegal token"+t.kind+"expected: " +" while statement");
 		}	
 	}
 	
@@ -266,7 +266,7 @@ public class Parser {
 			arg();
 		} else {
 			//TODO you will want to provide a more useful error message
-			throw new SyntaxException("illegal factor");
+			throw new SyntaxException("illegal token"+t.kind+"expected: " +" chain element");
 		}
 	}
 
@@ -336,7 +336,7 @@ public class Parser {
 				return consume();
 			}
 		}
-		throw new SyntaxException("saw: " + t.kind + "expected: " + kinds.toString());
+		throw new SyntaxException("saw: " + t.kind + "expected: " );
 	}
 
 	/**
