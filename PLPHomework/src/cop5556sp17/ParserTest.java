@@ -93,9 +93,9 @@ public class ParserTest {
 	
 	@Test
 	public void testProgramNoErr3() throws IllegalCharException, IllegalNumberException, SyntaxException{
-		String input = "prog integer i,url u,boolean b {integer i, boolean b image k sleep a*b+k;";
+		String input = "prog integer i,url u,boolean b {integer i boolean b sleep a*c;}";
 		Parser parser = new Parser(new Scanner(input).scan());
-		thrown.expect(Parser.SyntaxException.class);
+		//thrown.expect(Parser.SyntaxException.class);
 		parser.parse();
 	}
 	
