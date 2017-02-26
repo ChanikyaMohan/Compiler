@@ -2,7 +2,11 @@ package cop5556sp17;
 
 import cop5556sp17.Scanner.Kind;
 import static cop5556sp17.Scanner.Kind.*;
+
+import java.util.ArrayList;
+
 import cop5556sp17.Scanner.Token;
+import cop5556sp17.AST.*;
 
 public class Parser {
 
@@ -51,110 +55,161 @@ public class Parser {
 		return;
 	}
 	
-	void program() throws SyntaxException {
+	Program program() throws SyntaxException {
 		//Implemented
+		ArrayList<ParamDec> paramDecList = new ArrayList<>();
+		Block block;
+		Token first = t;
+		
 		match(IDENT);
 		if (t.isKind(LBRACE)){
-			block();
+			block = block();
 		}
 		else if(t.isKind(KW_URL) || t.isKind(KW_FILE) || t.isKind(KW_INTEGER) || t.isKind(KW_BOOLEAN)){
-			paramDec();
+			paramDecList.add(paramDec());
 			while(t.isKind(COMMA)){
 				consume();
 				//System.out.println("Comma consumed");
-				paramDec();
+				paramDecList.add(paramDec()); 
 			}
-			block();
+			block = block();
 		} else {
 			throw new SyntaxException("saw: " +t.kind +"expected: " +"Identifier or Paramdec");
 		}
+		return new Program(first, paramDecList,block);
 	}
 	
-	void expression() throws SyntaxException {
+	Expression expression() throws SyntaxException {
 		//Implemented this
-		term();
+		Token first = t, operator;
+		Expression exp,exp1;
+		exp = term();
 		while (t.isKind(LT ) || t.isKind(LE) || t.isKind(GT)|| t.isKind(GE) || t.isKind(EQUAL) || t.isKind(NOTEQUAL)) 
-		{
+		{	
+			operator = t;
 			consume();
-			term();
+			exp1 = term();
+			exp = new BinaryExpression(first, exp, operator, exp1); 
 		}
+		return exp;
 	}
 	
-	void term() throws SyntaxException {
+	Expression term() throws SyntaxException {
 		//Implemented
-		elem();
+		Token first = t,operator;
+		Expression exp,exp1;
+		exp = elem();
 		while (t.isKind(PLUS) || t.isKind(MINUS) || t.isKind(OR))
 		 {
+			operator = t;
 			consume(); 
-			elem();
+			exp1 = elem();
+			exp = new BinaryExpression(first,exp,operator,exp1);
 		}
+		return exp;
 	}
 
-	void elem() throws SyntaxException {
+	Expression elem() throws SyntaxException {
 		//Implemented
-		factor();
+		Token first = t,operator;
+		Expression exp,exp1;
+		exp = factor();
 		while (t.isKind(TIMES) || t.isKind(DIV) || t.isKind(AND) || t.isKind(MOD))
 		 {
+			operator = t;
 			consume(); 
-			factor();
+			exp1 = factor();
+			exp = new BinaryExpression(first, exp, operator, exp1);
 		}
+		return exp;
 	}
 
-	void factor() throws SyntaxException {
+	Expression factor() throws SyntaxException {
+		Token first = t;
+			
 		Kind kind = t.kind;
 		switch (kind) {
-		case IDENT: case INT_LIT: case KW_TRUE: case KW_FALSE: 	case KW_SCREENWIDTH: case KW_SCREENHEIGHT:{
+		case IDENT: {
 			consume();
-		} break;
+			return new IdentExpression(first);
+		}
+		case INT_LIT:{
+			consume();
+			return new IntLitExpression(first);
+		}
+		case KW_TRUE: case KW_FALSE:{
+			consume();
+			return new BooleanLitExpression(first);
+		}
+		case KW_SCREENWIDTH: case KW_SCREENHEIGHT:{
+			consume();
+			return new ConstantExpression(first);
+		}
 		case LPAREN: {
+			Expression exp;
 			consume();
-			expression();
+			exp = expression();
 			match(RPAREN);
-		} break;
+			return exp;
+		}
 		default:
 			throw new SyntaxException("illegal factor");
 		}
 	}
 
-	void block() throws SyntaxException {
+	Block block() throws SyntaxException {
 		//Implemented
+		Token first = t;
+		ArrayList<Dec> decList = new ArrayList<Dec>();
+		ArrayList<Statement> statementList = new ArrayList<Statement>();
+		
 		if(t.isKind(LBRACE)){
 			consume();
 			while(!t.isKind(RBRACE)){
 				if(t.isKind(KW_INTEGER) || t.isKind(KW_BOOLEAN) || t.isKind(KW_IMAGE) || t.isKind(KW_FRAME)){
-					dec(); 
+					decList.add(dec()); 
 				} else {
-					statement();
+					statementList.add(statement());
 				}
 			}
 			match(RBRACE);
 		} else {
 			throw new SyntaxException("illegal token saw: " +t.kind +"expected: " +"block");
 		}
+		return new Block(first,decList,statementList);
 	}
 
-	void paramDec() throws SyntaxException {
+	ParamDec paramDec() throws SyntaxException {
 		//Implemented
+		Token first = t,next;
 		if(t.isKind(KW_URL) || t.isKind(KW_FILE) || t.isKind(KW_INTEGER) || t.isKind(KW_BOOLEAN)){
 			consume();
+			
 		} else {
 			throw new SyntaxException("illegal token saw: " +t.kind +"expected: " +"param dec");
 		}
+		next = t;
 		match(IDENT);
+		return new paramDec(first,next);
 	}
 
-	void dec() throws SyntaxException {
+	Dec dec() throws SyntaxException {
 		//Implemented
+		Token first = t,next;
 		if(t.isKind(KW_INTEGER) || t.isKind(KW_BOOLEAN) || t.isKind(KW_IMAGE) || t.isKind(KW_FRAME)){
 			consume();
 		} else {
 			throw new SyntaxException("illegal factor");
 		}
+		next = t;
 		match(IDENT);
+		return Dec(first,next);
 	}
 
-	void statement() throws SyntaxException {
+	Statement statement() throws SyntaxException {
 		//Implemented
+		Token first = t;
+		Statement s;
 		if(t.isKind(OP_SLEEP)){
 			match(OP_SLEEP);
 			expression();
