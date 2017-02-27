@@ -287,7 +287,8 @@ public class Parser {
 	Chain chain() throws SyntaxException {
 		//Implemented
 		Token first = t,op;
-		Chain c,c1;
+		Chain c;
+		ChainElem c1;
 		c = chainElem();
 		op = t;
 		arrowOp();
