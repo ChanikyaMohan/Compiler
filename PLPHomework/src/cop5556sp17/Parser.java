@@ -190,7 +190,7 @@ public class Parser {
 		}
 		next = t;
 		match(IDENT);
-		return new paramDec(first,next);
+		return new ParamDec(first,next);
 	}
 
 	Dec dec() throws SyntaxException {
@@ -203,32 +203,32 @@ public class Parser {
 		}
 		next = t;
 		match(IDENT);
-		return Dec(first,next);
+		return new Dec(first,next);
 	}
 
 	Statement statement() throws SyntaxException {
 		//Implemented
 		Token first = t;
-		Statement s;
+		Statement stat;
 		if(t.isKind(OP_SLEEP)){
 			match(OP_SLEEP);
-			expression();
+			stat = new SleepStatement(first,expression());
 			match(SEMI);
 		} else if(t.isKind(KW_WHILE)){
-			whileStatement();
+			stat = whileStatement();
 		} else if(t.isKind(KW_IF)){
-			ifStatement();
+			stat = ifStatement();
 		} else if(t.isKind(IDENT)){
 			if (scanner.peek().kind.toString() == "ASSIGN"){
-				assign();
+				stat = assign();
 			} else {
-				chain();
+				stat = chain();
 			}
 			//System.out.println("Semi matched");
 			match(SEMI);
 		} else {
 			if (t.isKind(OP_BLUR) || t.isKind(OP_GRAY) || t.isKind(OP_CONVOLVE) || t.isKind(KW_SHOW) || t.isKind(KW_HIDE) || t.isKind(KW_MOVE) ||t.isKind(KW_XLOC) || t.isKind(KW_YLOC) || t.isKind(OP_WIDTH) || t.isKind(OP_HEIGHT) || t.isKind(KW_SCALE)){
-				chain();
+				stat = chain();
 				//System.out.println("Semi matched");
 				match(SEMI);
 			}
@@ -236,84 +236,115 @@ public class Parser {
 				throw new SyntaxException("illegal token"+t.kind+"expected: " +" a statements");
 			}
 		}
+		return stat;
 	}
 	
-	void ifStatement() throws SyntaxException {
+	IfStatement ifStatement() throws SyntaxException {
+		Token first =t;
+		Expression exp;
+		Block b;
+		
 		match(KW_IF);
 		if(t.isKind(LPAREN)){
 			consume();
-			expression();
+			exp = expression();
 			match(RPAREN);
-			block();
+			b = block();
 		} else {
 			throw new SyntaxException("illegal token"+t.kind+"expected: " +" if statement");
 		}
+		return new IfStatement(first,exp,b);
 	}
 	
-	void assign() throws SyntaxException {
+	AssignmentStatement assign() throws SyntaxException {
+		IdentLValue var;
+		Expression exp;
+		Token first= t;
+		var = new IdentLValue(t);
 		match(IDENT);
 		match(ASSIGN);
-		expression();
+		exp = expression();
+		return new AssignmentStatement(first, var, exp);
 	}
 	
-	void whileStatement() throws SyntaxException {
+	WhileStatement whileStatement() throws SyntaxException {
+		Token first = t;
+		Expression exp;
+		Block bl;
+		
 		match(KW_WHILE);
 		if(t.isKind(LPAREN)){
 			consume();
-			expression();
+			exp = expression();
 			match(RPAREN);
-			block();
+			bl = block();
 		} else {
 			throw new SyntaxException("illegal token"+t.kind+"expected: " +" while statement");
-		}	
+		}
+		return new WhileStatement(first, exp, bl);
 	}
 	
-	void chain() throws SyntaxException {
+	Chain chain() throws SyntaxException {
 		//Implemented
-		chainElem();
+		Token first = t,op;
+		Chain c,c1;
+		c = chainElem();
+		op = t;
 		arrowOp();
-		chainElem();
+		c1 = chainElem();
+		c = new BinaryChain(first,c,op,c1);
 		while(t.isKind(ARROW) || t.isKind(BARARROW)){
+			op = t;
 			arrowOp();
-			chainElem();
+			c1 = chainElem();
+			c = new BinaryChain(first,c,op,c1);
 		}
+		return c;
 	}
 	
 	void arrowOp() throws SyntaxException {
 		match(ARROW, BARARROW);
 	}
 	
-	void chainElem() throws SyntaxException {
+	ChainElem chainElem() throws SyntaxException {
 		//Implemented
 		//System.out.println("chain elem");
+		Token first = t;
+		ChainElem chel;
+		
 		if(t.isKind(IDENT)){
 			//System.out.println("identifier consumed");
-			consume();	
+			consume();
+			chel = new IdentChain(first);
 		} else if(t.isKind(OP_BLUR ) || t.isKind(OP_GRAY) || t.isKind(OP_CONVOLVE)){
 			consume();
-			arg();
+			chel = new FilterOpChain(first, arg());
 		} else if(t.isKind(KW_SHOW) || t.isKind(KW_HIDE) || t.isKind(KW_MOVE) || t.isKind(KW_XLOC) || t.isKind(KW_YLOC)){
 			consume();
-			arg();
+			chel = new FrameOpChain(first,arg());
 		} else if(t.isKind(OP_WIDTH) || t.isKind(OP_HEIGHT) || t.isKind(KW_SCALE)){
 			consume();
-			arg();
+			chel = new ImageOpChain(first,arg());
 		} else {
 			throw new SyntaxException("illegal token"+t.kind+"expected: " +" chain element");
 		}
+		return chel;
 	}
 
-	void arg() throws SyntaxException {
+	Tuple arg() throws SyntaxException {
 		//Implemented
+		Token first = t;
+		ArrayList<Expression> expList = new ArrayList<Expression>();
 		if(t.isKind(LPAREN)){
 			consume();
-			expression();
+			expList.add(expression());
 			while(t.isKind(COMMA)){
 				consume();
-				expression();
+				expList.add(expression());
 			}
 			match(RPAREN);
 		}
+		return new Tuple(first,expList);
 		// don't throw error here
 	}
 
