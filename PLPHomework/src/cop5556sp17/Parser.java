@@ -49,10 +49,10 @@ public class Parser {
 	 * 
 	 * @throws SyntaxException
 	 */
-	void parse() throws SyntaxException {
-		program();
+	ASTNode parse() throws SyntaxException {
+		ASTNode node = program();
 		matchEOF();
-		return;
+		return node;
 	}
 	
 	Program program() throws SyntaxException {
