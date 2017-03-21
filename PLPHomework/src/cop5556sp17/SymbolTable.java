@@ -55,6 +55,11 @@ public class SymbolTable {
 			array = new ArrayList<MyValue>();
 			tab.put(ident, array);
 		}
+		for(int i=0;i<array.size();i++){
+			if(array.get(i).i == current_scope){
+				return false;
+			}
+		}
 		array.add(new MyValue(dec,current_scope));//if found add into array
 		return true;
 	}
@@ -62,6 +67,7 @@ public class SymbolTable {
 	public Dec lookup(String ident){
 		//TODO:  IMPLEMENT THIS
 		ArrayList<MyValue> array = tab.get(ident);
+		if(array == null) return null;
 		for(int i=0; i<array.size(); i++){
 			for(int j=scope_stack.size() - 1; j >=0; j--){
 				if (array.get(i).i == scope_stack.get(j)){

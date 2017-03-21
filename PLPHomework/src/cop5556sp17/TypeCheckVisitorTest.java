@@ -1,10 +1,3 @@
-/**  Important to test the error cases in case the
- * AST is not being completely traversed.
- * 
- * Only need to test syntactically correct programs, or
- * program fragments.
- */
-
 package cop5556sp17;
 
 import static org.junit.Assert.*;
@@ -129,5 +122,25 @@ public class TypeCheckVisitorTest {
 		program.visit(v, null);
 	}
 
-
+	@Test 
+	public void testAssignmntErr() throws Exception{
+		String input = "p {x <- a; }";
+		Scanner scanner = new Scanner(input); scanner.scan();
+		Parser parser = new Parser(scanner);
+		ASTNode program = parser.parse();
+		TypeCheckVisitor v = new TypeCheckVisitor();
+		thrown.expect(TypeCheckVisitor.TypeCheckException.class);
+		program.visit(v, null); 
+	}
+	
+	@Test 
+	public void testAssignmntErr2() throws Exception{
+		String input = "p {integer x integer x }";
+		Scanner scanner = new Scanner(input); scanner.scan();
+		Parser parser = new Parser(scanner);
+		ASTNode program = parser.parse();
+		TypeCheckVisitor v = new TypeCheckVisitor();
+		thrown.expect(TypeCheckVisitor.TypeCheckException.class);
+		program.visit(v, null); 
+	}
 }

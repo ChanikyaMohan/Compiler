@@ -350,7 +350,9 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitDec(Dec declaration, Object arg) throws Exception {
 		// TODO Auto-generated method stub
-		symtab.insert(declaration.getIdent().getText(), declaration);
+		if(!symtab.insert(declaration.getIdent().getText(), declaration)){
+			throw new TypeCheckException("TypeError");
+		}
 		return null;
 	}
 
@@ -395,7 +397,9 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitParamDec(ParamDec paramDec, Object arg) throws Exception {
 		// TODO Auto-generated method stub
-		symtab.insert(paramDec.getIdent().getText(), paramDec);
+		if(!symtab.insert(paramDec.getIdent().getText(), paramDec)){
+			throw new TypeCheckException("TypeError");
+		}
 		return null;
 	}
 
