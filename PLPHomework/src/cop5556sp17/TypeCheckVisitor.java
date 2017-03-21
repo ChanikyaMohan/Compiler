@@ -386,6 +386,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 			throw new TypeCheckException("Type Check Error");
 		}
 		identX.dec = d;
+		identX.type = d.getType();
 		return null;
 	}
 

@@ -53,7 +53,18 @@ public class TypeCheckVisitorTest {
 		thrown.expect(TypeCheckVisitor.TypeCheckException.class);
 		program.visit(v, null);		
 	}		
-
+	
+	@Test
+	public void testAssignmentBoolLitError1() throws Exception{
+		String input = "p {\nboolean y \ny <- x;}";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		Parser parser = new Parser(scanner);
+		ASTNode program = parser.parse();
+		TypeCheckVisitor v = new TypeCheckVisitor();
+		thrown.expect(TypeCheckVisitor.TypeCheckException.class);
+		program.visit(v, null);		
+	}
 
 
 }
