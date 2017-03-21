@@ -154,6 +154,8 @@ public class TypeCheckVisitor implements ASTVisitor {
 		Expression e0, e1;
 		e0 = binaryExpression.getE0();
 		e1 = binaryExpression.getE1();
+		e0.visit(this, arg);
+		e1.visit(this, arg);
 		Token op = binaryExpression.getOp();
 		
 		if(op.kind.equals(PLUS) ||op.kind.equals(MINUS)){
