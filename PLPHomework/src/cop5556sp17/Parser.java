@@ -1,6 +1,7 @@
 package cop5556sp17;
 
 import cop5556sp17.Scanner.Kind;
+
 import static cop5556sp17.Scanner.Kind.*;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class Parser {
 
 	Scanner scanner;
 	Token t;
-
+	
 	Parser(Scanner scanner) {
 		this.scanner = scanner;
 		t = scanner.nextToken();

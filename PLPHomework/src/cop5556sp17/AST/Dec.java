@@ -1,6 +1,9 @@
 package cop5556sp17.AST;
 
 import cop5556sp17.Scanner.Token;
+import cop5556sp17.AST.Type.TypeName;
+import cop5556sp17.Parser.SyntaxException;
+
 
 public class Dec extends ASTNode {
 	
@@ -12,11 +15,11 @@ public class Dec extends ASTNode {
 		this.ident = ident;
 	}
 
-	public Token getType() {
-		return firstToken;
+	public TypeName getType() throws SyntaxException {
+		return Type.getTypeName(firstToken);
 	}
 
-	public Token getIdent() {
+	public Token getIdent() {	
 		return ident;
 	}
 

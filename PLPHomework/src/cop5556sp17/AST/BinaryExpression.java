@@ -53,7 +53,7 @@ public class BinaryExpression extends Expression {
 	final Expression e0;
 	final Token op;
 	final Expression e1;
-
+	
 	public BinaryExpression(Token firstToken, Expression e0, Token op, Expression e1) {
 		super(firstToken);
 		this.e0 = e0;
@@ -72,7 +72,7 @@ public class BinaryExpression extends Expression {
 	public Token getOp() {
 		return op;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "BinaryExpression [e0=" + e0 + ", op=" + op + ", e1=" + e1 + "]";

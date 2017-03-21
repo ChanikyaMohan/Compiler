@@ -3,6 +3,7 @@ package cop5556sp17.AST;
 import cop5556sp17.Scanner.Token;
 
 public abstract class ASTNode {
+
 	protected ASTNode(Token firstToken){
 		this.firstToken=firstToken;
 	}
