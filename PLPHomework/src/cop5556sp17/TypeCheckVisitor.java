@@ -69,75 +69,53 @@ public class TypeCheckVisitor implements ASTVisitor {
 		chain.visit(this, arg);
 		Token t = binaryChain.getArrow();
 		ChainElem celem = binaryChain.getE1();
-		celem.visit(this, arg);
+ 		celem.visit(this, arg);
 		if (t.isKind(ARROW)){
 			if (chain.type.equals(URL) && 
 				celem.type.equals(IMAGE)){
 				binaryChain.type = IMAGE;
+			} else if (chain.type.equals(FRAME) && 
+					(celem.getFirstToken().isKind(KW_XLOC)||
+							 celem.getFirstToken().isKind(KW_YLOC))){
+						binaryChain.type = INTEGER;
 			} else if (chain.type.equals(FILE) &&
 					celem.type.equals(IMAGE)){
 				binaryChain.type = IMAGE;
-			} else if (chain.type.equals(FRAME) && 
-					(first.isKind(KW_XLOC)||
-					 first.isKind(KW_YLOC)) &&
+			}  else if (chain.type.equals(FRAME) && 
 					(celem.getFirstToken().isKind(KW_SHOW)||
 					 celem.getFirstToken().isKind(KW_HIDE)||
-					 celem.getFirstToken().isKind(KW_MOVE)||
-					 celem.getFirstToken().isKind(KW_XLOC)||
-					 celem.getFirstToken().isKind(KW_YLOC))){
-				binaryChain.type = INTEGER;
-			} else if (chain.type.equals(FRAME) && 
-					(first.isKind(KW_SHOW)||
-					 first.isKind(KW_HIDE)||
-					 first.isKind(KW_MOVE)) &&
-					(celem.getFirstToken().isKind(KW_SHOW)||
-					 celem.getFirstToken().isKind(KW_HIDE)||
-					 celem.getFirstToken().isKind(KW_MOVE)||
-					 celem.getFirstToken().isKind(KW_XLOC)||
-					 celem.getFirstToken().isKind(KW_YLOC))){
+					 celem.getFirstToken().isKind(KW_MOVE))){
 				binaryChain.type = FRAME;
 			} else if (chain.type.equals(IMAGE) &&
-					(first.isKind(OP_WIDTH)||
-					 first.isKind(OP_HEIGHT)) &&
 					(celem.getFirstToken().isKind(OP_WIDTH) ||
-					 celem.getFirstToken().isKind(OP_HEIGHT)||
-					 celem.getFirstToken().isKind(KW_SCALE))){
+					 celem.getFirstToken().isKind(OP_HEIGHT))){
 						binaryChain.type = INTEGER;
+			} else if (chain.type.equals(TypeName.IMAGE) &&
+					(celem.getFirstToken().isKind(OP_GRAY)||
+							 celem.getFirstToken().isKind(OP_BLUR)||
+							 celem.getFirstToken().isKind(OP_CONVOLVE))){
+								binaryChain.type = IMAGE;
+			} else if (chain.type.equals(IMAGE) &&
+					celem.type.equals(FILE)){
+				binaryChain.type = NONE;
 			} else if (chain.type.equals(IMAGE) &&
 					celem.type.equals(FRAME)){
 						binaryChain.type = FRAME;
-			} else if (chain.type.equals(IMAGE) &&
-					celem.type.equals(FILE)){
-						binaryChain.type = NONE;
-			} else if (chain.type.equals(TypeName.IMAGE) &&
-					(first.isKind(OP_GRAY)||
-					 first.isKind(OP_BLUR)||
-					 first.isKind(OP_CONVOLVE)) &&
-					(celem.getFirstToken().isKind(OP_WIDTH)||
-					 celem.getFirstToken().isKind(OP_HEIGHT)||
-					 celem.getFirstToken().isKind(KW_SCALE))){
-						binaryChain.type = IMAGE;
-			} else if (chain.type.equals(TypeName.IMAGE) &&
-					first.isKind(KW_SCALE) &&
-					(celem.getFirstToken().isKind(OP_WIDTH)||
-					 celem.getFirstToken().isKind(OP_HEIGHT)||
-					 celem.getFirstToken().isKind(KW_SCALE))){
-						binaryChain.type = IMAGE;
-			} else if (chain.type.equals(TypeName.IMAGE) &&
+			}  else if (chain.type.equals(TypeName.IMAGE) &&
 					celem.getFirstToken().isKind(IDENT)){
 						binaryChain.type = IMAGE;
-			} else{
+			}  else if (chain.type.equals(TypeName.IMAGE) &&
+					(celem.getFirstToken().isKind(KW_SCALE))){
+						binaryChain.type = IMAGE;
+			}  else{
 				throw new TypeCheckException("Type check Error");
 			}
 		}
 		else if(t.isKind(BARARROW)){
 			if (chain.type.equals(TypeName.IMAGE) &&
-				(first.isKind(OP_GRAY)||
-				first.isKind(OP_BLUR)||
-				first.isKind(OP_CONVOLVE)) &&
-				(celem.getFirstToken().isKind(OP_WIDTH)||
-				celem.getFirstToken().isKind(OP_HEIGHT)||
-				celem.getFirstToken().isKind(KW_SCALE))){
+				(celem.getFirstToken().isKind(OP_GRAY)||
+				celem.getFirstToken().isKind(OP_BLUR)||
+				celem.getFirstToken().isKind(OP_CONVOLVE))){
 				binaryChain.type = IMAGE;
 			} else {
 				throw new TypeCheckException("Type check Error");
@@ -152,11 +130,12 @@ public class TypeCheckVisitor implements ASTVisitor {
 	public Object visitBinaryExpression(BinaryExpression binaryExpression, Object arg) throws Exception {
 		// TODO Auto-generated method stub
 		Expression e0, e1;
+		Token op = binaryExpression.getOp();
 		e0 = binaryExpression.getE0();
 		e1 = binaryExpression.getE1();
 		e0.visit(this, arg);
 		e1.visit(this, arg);
-		Token op = binaryExpression.getOp();
+		
 		
 		if(op.kind.equals(PLUS) ||op.kind.equals(MINUS)){
 			if (e0.type.equals(INTEGER) && e1.type.equals(INTEGER)){
@@ -169,24 +148,22 @@ public class TypeCheckVisitor implements ASTVisitor {
 		} else if(op.kind.equals(TIMES)){
 			if (e0.type.equals(INTEGER) && e1.type.equals(INTEGER)){
 				binaryExpression.type = INTEGER;
-			} else if (e0.type.equals(INTEGER) && e1.type.equals(IMAGE)){
+			} else if ((e0.type.equals(INTEGER) && e1.type.equals(IMAGE))
+					|| (e0.type.equals(IMAGE) && e1.type.equals(INTEGER))){
 				binaryExpression.type = IMAGE;
-			} else if (e0.type.equals(IMAGE) && e1.type.equals(INTEGER)){
-				binaryExpression.type = IMAGE;
+			} else {
+				throw new TypeCheckException("Type check Error");
+			}
+		} else if(op.kind.equals(LT) || op.kind.equals(GT) || op.kind.equals(LE) || op.kind.equals(GE) ){
+			if ((e0.type.equals(INTEGER) && e1.type.equals(INTEGER)) 
+					|| (e0.type.equals(BOOLEAN) && e1.type.equals(BOOLEAN))){
+				binaryExpression.type = BOOLEAN;
 			} else {
 				throw new TypeCheckException("Type check Error");
 			}
 		} else if(op.kind.equals(DIV)){
 			if (e0.type.equals(INTEGER) && e1.type.equals(INTEGER)){
 				binaryExpression.type = INTEGER;
-			} else {
-				throw new TypeCheckException("Type check Error");
-			}
-		} else if(op.kind.equals(LT) || op.kind.equals(GT) || op.kind.equals(LE) || op.kind.equals(GE) ){
-			if (e0.type.equals(INTEGER) && e1.type.equals(INTEGER)){
-				binaryExpression.type = BOOLEAN;
-			} else if (e0.type.equals(BOOLEAN) && e1.type.equals(BOOLEAN)){
-				binaryExpression.type = BOOLEAN;
 			} else {
 				throw new TypeCheckException("Type check Error");
 			}
@@ -240,7 +217,8 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitFilterOpChain(FilterOpChain filterOpChain, Object arg) throws Exception {
 		// TODO Auto-generated method stub
-		if (filterOpChain.getArg().getExprList().size() != 0){
+		int s = filterOpChain.getArg().getExprList().size();
+		if (s != 0){
 			throw new TypeCheckException("Type Check Error");
 		}
 		filterOpChain.type = IMAGE;
@@ -254,20 +232,23 @@ public class TypeCheckVisitor implements ASTVisitor {
 		Token token = frameOpChain.firstToken;
 		if (token.isKind(KW_SHOW)||
 			token.isKind(KW_HIDE)){
-			if (tuple.getExprList().size() != 0){
+			int s = tuple.getExprList().size(); 
+			if (s != 0){
 				throw new TypeCheckException("Type Check Error");
 			}
 			frameOpChain.type = NONE;
 		}
 		else if (token.isKind(KW_XLOC)||
 				token.isKind(KW_YLOC)){
-			if (tuple.getExprList().size() != 0){
+			int s = tuple.getExprList().size(); 
+			if ( s != 0){
 				throw new TypeCheckException("Type Check Error");
 			}
 			frameOpChain.type = TypeName.INTEGER;
 		}
 		else if(token.isKind(KW_MOVE)){
-			if (tuple.getExprList().size() != 2){
+			int s = tuple.getExprList().size(); 
+			if (s != 2){
 				throw new TypeCheckException("Type Check Error");
 			}
 			frameOpChain.type = NONE;
@@ -282,11 +263,11 @@ public class TypeCheckVisitor implements ASTVisitor {
 	public Object visitIdentChain(IdentChain identChain, Object arg) throws Exception {
 		// TODO Auto-generated method stub
 		Token first = identChain.getFirstToken();
-		Dec d = symtab.lookup(first.getText());
-		if (d == null){
+		Dec dec = symtab.lookup(first.getText());
+		if (symtab.lookup(first.getText()) == null){// lookup not found
 			throw new TypeCheckException("Type Check Error");
 		}
-		identChain.type = d.getType();
+		identChain.type = dec.getType();
 		return null;
 	}
 
@@ -294,21 +275,21 @@ public class TypeCheckVisitor implements ASTVisitor {
 	public Object visitIdentExpression(IdentExpression identExpression, Object arg) throws Exception {
 		// TODO Auto-generated method stub
 		Token first = identExpression.getFirstToken();
-		Dec d = symtab.lookup(first.getText());
-		if (d == null){
+		Dec dec = symtab.lookup(first.getText());
+		if (symtab.lookup(first.getText()) == null){
 			throw new TypeCheckException("Type Check Error");
 		}
-		identExpression.type = d.getType();
-		identExpression.d = d;
+		identExpression.d = dec;
+		identExpression.type = dec.getType();
 		return null;
 	}
 
 	@Override
 	public Object visitIfStatement(IfStatement ifStatement, Object arg) throws Exception {
 		// TODO Auto-generated method stub
-		Expression e = ifStatement.getE();
-		e.visit(this, arg);
-		if(e.type != BOOLEAN){
+		Expression exp = ifStatement.getE();
+		exp.visit(this, arg);//visit expression and set its type
+		if(!exp.type.equals(BOOLEAN)){
 			throw new TypeCheckException("Type Check Error");
 		}
 		Block block = ifStatement.getB();
@@ -326,9 +307,9 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitSleepStatement(SleepStatement sleepStatement, Object arg) throws Exception {
 		// TODO Auto-generated method stub
-		Expression e = sleepStatement.getE();
-		e.visit(this, arg);
-		if(e.type!= INTEGER){
+		Expression exp = sleepStatement.getE();
+		exp.visit(this, arg);
+		if(!exp.type.equals(INTEGER)){
 			throw new TypeCheckException("Type Check Error");
 		}
 		return null;
@@ -337,9 +318,9 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitWhileStatement(WhileStatement whileStatement, Object arg) throws Exception {
 		// TODO Auto-generated method stub
-		Expression e = whileStatement.getE();
-		e.visit(this, arg);
-		if(e.type != BOOLEAN){
+		Expression exp = whileStatement.getE();
+		exp.visit(this, arg);
+		if(!exp.type.equals(BOOLEAN)){
 			throw new TypeCheckException("Type Check Error");
 		}
 		Block block = whileStatement.getB();
@@ -360,8 +341,10 @@ public class TypeCheckVisitor implements ASTVisitor {
 	public Object visitProgram(Program program, Object arg) throws Exception {
 		// TODO Auto-generated method stub
 		ArrayList<ParamDec> array = program.getParams();
-		for (int i=0; i<array.size(); i++){
+		int i=0;
+		while ( i<array.size()){
 			array.get(i).visit(this, arg);
+			i++;
 		}
 		Block block = program.getB();
 		block.visit(this, arg);
@@ -373,9 +356,9 @@ public class TypeCheckVisitor implements ASTVisitor {
 		// TODO Auto-generated method stub
 		IdentLValue i = assignStatement.getVar();
 		i.visit(this, arg);
-		Expression e = assignStatement.getE();
-		e.visit(this, arg);
-		if(!(e.type.equals(i.type))){
+		Expression exp = assignStatement.getE();
+		exp.visit(this, arg);
+		if(!(exp.type.equals(i.type))){
 			throw new TypeCheckException("Type Check Error");
 		}
 		return null;
@@ -384,13 +367,15 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitIdentLValue(IdentLValue identX, Object arg) throws Exception {
 		// TODO Auto-generated method stub
-		Token first = identX.getFirstToken();
-		Dec d = symtab.lookup(first.getText());
-		if (d == null){
+		//Token first = identX.getFirstToken();
+		//Dec d = symtab.lookup(first.getText());
+		Dec dec = symtab.lookup(identX.getText());
+		if (symtab.lookup(identX.getText()) == null){
 			throw new TypeCheckException("Type Check Error");
 		}
-		identX.dec = d;
-		identX.type = d.getType();
+		identX.dec = dec;
+		//identX.type = dec.getType();
+		identX.type = dec.getType();
 		return null;
 	}
 
@@ -415,15 +400,17 @@ public class TypeCheckVisitor implements ASTVisitor {
 		// TODO Auto-generated method stub
 		Tuple tuple = imageOpChain.getArg();
 		Token token = imageOpChain.firstToken;
-		imageOpChain.type = Type.getTypeName(token);
+		//imageOpChain.type = Type.getTypeName(token);
 		if (token.isKind(OP_WIDTH)|| token.isKind( OP_HEIGHT)){
-			if (tuple.getExprList().size() != 0){
+			int s = tuple.getExprList().size();
+			if ( s != 0){
 				throw new TypeCheckException("Type Check Error");
 			}
 			imageOpChain.type = TypeName.INTEGER;
 		}
 		else if (token.isKind(KW_SCALE)){
-			if (tuple.getExprList().size() != 1){
+			int s = tuple.getExprList().size();
+			if ( s != 1){
 				throw new TypeCheckException("Type Check Error");
 			}
 			imageOpChain.type = TypeName.IMAGE;
@@ -435,11 +422,13 @@ public class TypeCheckVisitor implements ASTVisitor {
 	public Object visitTuple(Tuple tuple, Object arg) throws Exception {
 		// TODO Auto-generated method stub
 		List<Expression> elist = tuple.getExprList();
-		for (int i=0;i<elist.size();i++){
+		int i=0;
+		while (i<elist.size()){
 			elist.get(i).visit(this, arg);
-			if(elist.get(i).type.equals(INTEGER)){
+			if(!(elist.get(i).type.equals(INTEGER))){
 				throw new TypeCheckException("Type Check Error");
-			}	
+			}
+			i++;
 		}
 		
 		return null;

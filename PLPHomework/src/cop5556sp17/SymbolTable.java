@@ -68,9 +68,9 @@ public class SymbolTable {
 		//TODO:  IMPLEMENT THIS
 		ArrayList<MyValue> array = tab.get(ident);
 		if(array == null) return null;
-		for(int i=0; i<array.size(); i++){
-			for(int j=scope_stack.size() - 1; j >=0; j--){
-				if (array.get(i).i == scope_stack.get(j)){
+		for(int j=scope_stack.size() - 1; j >=0; j--){
+			for(int i=0; i<array.size(); i++){
+				if (scope_stack.get(j) == array.get(i).i){
 					return array.get(i).dec;
 				}
 			}
