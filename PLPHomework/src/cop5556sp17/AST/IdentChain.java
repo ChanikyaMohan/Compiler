@@ -4,6 +4,9 @@ import cop5556sp17.Scanner.Token;
 
 public class IdentChain extends ChainElem {
 
+	public Dec declaration;
+
+
 	public IdentChain(Token firstToken) {
 		super(firstToken);
 	}

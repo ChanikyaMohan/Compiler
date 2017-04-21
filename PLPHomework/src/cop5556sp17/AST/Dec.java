@@ -6,8 +6,10 @@ import cop5556sp17.Parser.SyntaxException;
 
 
 public class Dec extends ASTNode {
-	
+
 	final Token ident;
+	public Integer slotnumber;
+	boolean init;
 
 	public Dec(Token firstToken, Token ident) {
 		super(firstToken);
@@ -19,7 +21,7 @@ public class Dec extends ASTNode {
 		return Type.getTypeName(firstToken);
 	}
 
-	public Token getIdent() {	
+	public Token getIdent() {
 		return ident;
 	}
 
@@ -27,8 +29,8 @@ public class Dec extends ASTNode {
 	public String toString() {
 		return "Dec [ident=" + ident + ", firstToken=" + firstToken + "]";
 	}
-	
-	
+
+
 
 	@Override
 	public int hashCode() {
@@ -63,6 +65,16 @@ public class Dec extends ASTNode {
 	@Override
 	public Object visit(ASTVisitor v, Object arg) throws Exception {
 		return v.visitDec(this,arg);
+	}
+
+	public void setInitialized(boolean b) {
+		// TODO Auto-generated method stub
+		init = b;
+	}
+
+	public boolean getInitialized() {
+		// TODO Auto-generated method stub
+		return init;
 	}
 
 }

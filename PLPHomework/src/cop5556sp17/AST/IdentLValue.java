@@ -11,7 +11,7 @@ public class IdentLValue extends ASTNode {
 		this.type = null;
 		this.dec = null;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "IdentLValue [firstToken=" + firstToken + "]";

@@ -10,5 +10,8 @@ public abstract class Chain extends Statement {
 		super(firstToken);
 		type=null;
 	}
-	
+
+	public TypeName getType() {
+		return type;
+	}
 }

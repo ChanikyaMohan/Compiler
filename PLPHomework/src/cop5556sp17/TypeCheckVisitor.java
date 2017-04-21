@@ -71,17 +71,17 @@ public class TypeCheckVisitor implements ASTVisitor {
 		ChainElem celem = binaryChain.getE1();
  		celem.visit(this, arg);
 		if (t.isKind(ARROW)){
-			if (chain.type.equals(URL) && 
+			if (chain.type.equals(URL) &&
 				celem.type.equals(IMAGE)){
 				binaryChain.type = IMAGE;
-			} else if (chain.type.equals(FRAME) && 
+			} else if (chain.type.equals(FRAME) &&
 					(celem.getFirstToken().isKind(KW_XLOC)||
 							 celem.getFirstToken().isKind(KW_YLOC))){
 						binaryChain.type = INTEGER;
-			} else if (chain.type.equals(FILE) &&
-					celem.type.equals(IMAGE)){
+			} else if (chain.type == TypeName.FILE &&
+					celem.type == TypeName.IMAGE){
 				binaryChain.type = IMAGE;
-			}  else if (chain.type.equals(FRAME) && 
+			}  else if (chain.type.equals(FRAME) &&
 					(celem.getFirstToken().isKind(KW_SHOW)||
 					 celem.getFirstToken().isKind(KW_HIDE)||
 					 celem.getFirstToken().isKind(KW_MOVE))){
@@ -101,13 +101,16 @@ public class TypeCheckVisitor implements ASTVisitor {
 			} else if (chain.type.equals(IMAGE) &&
 					celem.type.equals(FRAME)){
 						binaryChain.type = FRAME;
-			}  else if (chain.type.equals(TypeName.IMAGE) &&
-					celem.getFirstToken().isKind(IDENT)){
-						binaryChain.type = IMAGE;
-			}  else if (chain.type.equals(TypeName.IMAGE) &&
+			} else if (chain.type.equals(TypeName.IMAGE) &&
 					(celem.getFirstToken().isKind(KW_SCALE))){
 						binaryChain.type = IMAGE;
-			}  else{
+			}   else if (chain.type.equals(TypeName.IMAGE) &&
+					 celem instanceof IdentChain && (celem.type == IMAGE)){
+				binaryChain.type = IMAGE;
+			}	else if (chain.type.equals(TypeName.INTEGER) &&
+					celem instanceof IdentChain   && (celem.type == INTEGER)){
+				binaryChain.type = INTEGER;
+			} else{
 				throw new TypeCheckException("Type check Error");
 			}
 		}
@@ -135,8 +138,8 @@ public class TypeCheckVisitor implements ASTVisitor {
 		e1 = binaryExpression.getE1();
 		e0.visit(this, arg);
 		e1.visit(this, arg);
-		
-		
+
+
 		if(op.kind.equals(PLUS) ||op.kind.equals(MINUS)){
 			if (e0.type.equals(INTEGER) && e1.type.equals(INTEGER)){
 				binaryExpression.type = INTEGER;
@@ -155,7 +158,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 				throw new TypeCheckException("Type check Error");
 			}
 		} else if(op.kind.equals(LT) || op.kind.equals(GT) || op.kind.equals(LE) || op.kind.equals(GE) ){
-			if ((e0.type.equals(INTEGER) && e1.type.equals(INTEGER)) 
+			if ((e0.type.equals(INTEGER) && e1.type.equals(INTEGER))
 					|| (e0.type.equals(BOOLEAN) && e1.type.equals(BOOLEAN))){
 				binaryExpression.type = BOOLEAN;
 			} else {
@@ -186,7 +189,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		ArrayList<Statement> stats = block.getStatements();
 		ArrayList<Dec> decs = block.getDecs();
 		int i=0,j=0;
-		while (j<stats.size() && i<decs.size()){	
+		while (j<stats.size() && i<decs.size()){
 			if (stats.get(j).firstToken.pos < decs.get(i).firstToken.pos){
 				stats.get(j).visit(this, arg);
 				j++;
@@ -232,7 +235,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		Token token = frameOpChain.firstToken;
 		if (token.isKind(KW_SHOW)||
 			token.isKind(KW_HIDE)){
-			int s = tuple.getExprList().size(); 
+			int s = tuple.getExprList().size();
 			if (s != 0){
 				throw new TypeCheckException("Type Check Error");
 			}
@@ -240,14 +243,14 @@ public class TypeCheckVisitor implements ASTVisitor {
 		}
 		else if (token.isKind(KW_XLOC)||
 				token.isKind(KW_YLOC)){
-			int s = tuple.getExprList().size(); 
+			int s = tuple.getExprList().size();
 			if ( s != 0){
 				throw new TypeCheckException("Type Check Error");
 			}
 			frameOpChain.type = TypeName.INTEGER;
 		}
 		else if(token.isKind(KW_MOVE)){
-			int s = tuple.getExprList().size(); 
+			int s = tuple.getExprList().size();
 			if (s != 2){
 				throw new TypeCheckException("Type Check Error");
 			}
@@ -268,6 +271,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 			throw new TypeCheckException("Type Check Error");
 		}
 		identChain.type = dec.getType();
+		identChain.declaration = dec;
 		return null;
 	}
 
@@ -430,7 +434,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 			}
 			i++;
 		}
-		
+
 		return null;
 	}
 
