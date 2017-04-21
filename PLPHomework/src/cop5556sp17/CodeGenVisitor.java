@@ -206,43 +206,26 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	public Object visitBinaryChain(BinaryChain binaryChain, Object arg) throws Exception {
 		//assert false : "not yet implemented";
 		binaryChain.getE0().visit(this, 0);
-		if (binaryChain.getArrow().isKind(Kind.BARARROW)) {
-			// IdentChain identChain = (IdentChain) binaryChain.getE0();
-
-			// mv.visitVarInsn(ALOAD, identChain.getDec().getSlotNum());
-			mv.visitInsn(DUP);
-
-		} else {
-			if (binaryChain.getE0().getType() == URL) {
-				mv.visitMethodInsn(INVOKESTATIC, PLPRuntimeImageIO.className, "readFromURL",
-						PLPRuntimeImageIO.readFromURLSig, false);
-
-				/*
-				 * Debug
-				 */
-
-//				System.out.println("INVOKESTATIC " + PLPRuntimeImageIO.className + " readFromURL "
-//						+ PLPRuntimeImageIO.readFromURLSig);
-
-			} else if (binaryChain.getE0().getType() == FILE) {
-				mv.visitMethodInsn(INVOKESTATIC, PLPRuntimeImageIO.className, "readFromFile",
-						PLPRuntimeImageIO.readFromFileDesc, false);
-
-				/*
-				 * Debug
-				 */
-
-//				System.out.println("INVOKESTATIC " + PLPRuntimeImageIO.className + " readFromFile "
-//						+ PLPRuntimeImageIO.readFromFileDesc);
-
-			}
+		switch(binaryChain.getArrow().kind){
+		case BARARROW: mv.visitInsn(DUP); break;
+		default: switch(binaryChain.getE0().getType()){
+					case URL: mv.visitMethodInsn(INVOKESTATIC, PLPRuntimeImageIO.className, "readFromURL",
+							PLPRuntimeImageIO.readFromURLSig, false); break;
+					case FILE: mv.visitMethodInsn(INVOKESTATIC, PLPRuntimeImageIO.className, "readFromFile",
+							PLPRuntimeImageIO.readFromFileDesc, false); break;
+					default: break;
+		} break;
 		}
 
-		if (binaryChain.getArrow().isKind(Kind.BARARROW)) {
-			binaryChain.getE1().visit(this, 3);
-		} else {
-			binaryChain.getE1().visit(this, 1);
+		switch(binaryChain.getArrow().kind){
+			case BARARROW: binaryChain.getE1().visit(this, 3);break;
+			default: binaryChain.getE1().visit(this, 1); break;
 		}
+//		if (binaryChain.getArrow().isKind(Kind.BARARROW)) {
+//			binaryChain.getE1().visit(this, 3);
+//		} else {
+//			binaryChain.getE1().visit(this, 1);
+//		}
 		if (binaryChain.getE1() instanceof IdentChain) {
 			IdentChain identChain = (IdentChain) binaryChain.getE1();
 			if ((identChain.declaration instanceof ParamDec)) {
