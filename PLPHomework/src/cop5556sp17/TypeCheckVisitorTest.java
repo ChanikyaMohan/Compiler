@@ -275,37 +275,6 @@ public class TypeCheckVisitorTest {
         program.visit(v, null);
     }
 
-    // Chain
-    // ChainElem
-    // IdentChain
-    @Test
-    public void testIdentChain() throws Exception {
-        String input = "p {\nimage x boolean y \nx -> y;}";
-        Scanner scanner = new Scanner(input);
-        scanner.scan();
-        Parser parser = new Parser(scanner);
-        ASTNode ast = parser.parse();
-        assertEquals(Program.class, ast.getClass());
-        Program program = (Program) ast;
-        Block block = program.getB();
-        List<Statement> statements = block.getStatements();
-        List<Dec> decs = block.getDecs();
-        assertEquals(1, statements.size());
-        assertEquals(2, decs.size());
-        Statement statement = statements.get(0);
-        assertEquals(BinaryChain.class, statement.getClass());
-        BinaryChain binaryChain = (BinaryChain) statement;
-        Chain e0 = binaryChain.getE0();
-        ChainElem e1 = binaryChain.getE1();
-        assertEquals(IdentChain.class, e0.getClass());
-        assertEquals(IdentChain.class, e1.getClass());
-
-        TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor();
-        program.visit(typeCheckVisitor, null);
-
-        assertEquals(Type.TypeName.IMAGE, e0.type);
-        assertEquals(Type.TypeName.BOOLEAN, e1.type);
-    }
 
     @Test
     public void testIdentChainWhenNotDeclared() throws Exception {
@@ -546,25 +515,6 @@ public class TypeCheckVisitorTest {
         assertEquals(Type.TypeName.NONE, binaryChain.type);
     }
 
-    @Test
-    public void testBinaryChain4() throws Exception {
-        String input = "p {image a boolean b \n a -> b;}";
-        Scanner scanner = new Scanner(input);
-        scanner.scan();
-        Parser parser = new Parser(scanner);
-        Program program = (Program) parser.parse();
-        Block block = program.getB();
-        List<Statement> statements = block.getStatements();
-        assertEquals(1, statements.size());
-        Statement statement = statements.get(0);
-        assertEquals(BinaryChain.class, statement.getClass());
-        BinaryChain binaryChain = (BinaryChain) statement;
-
-        TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor();
-        program.visit(typeCheckVisitor, null);
-
-        assertEquals(Type.TypeName.IMAGE, binaryChain.type);
-    }
 
     @Test
     public void testBinaryChain5() throws Exception {

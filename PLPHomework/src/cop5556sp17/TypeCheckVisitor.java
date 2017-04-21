@@ -1,6 +1,5 @@
 package cop5556sp17;
 
-import cop5556sp17.AST.ASTNode;
 import cop5556sp17.AST.ASTVisitor;
 import cop5556sp17.AST.Tuple;
 import cop5556sp17.AST.AssignmentStatement;
@@ -31,8 +30,7 @@ import cop5556sp17.AST.WhileStatement;
 import java.util.ArrayList;
 import java.util.List;
 
-import cop5556sp17.Scanner.Kind;
-import cop5556sp17.Scanner.LinePos;
+
 import cop5556sp17.Scanner.Token;
 import static cop5556sp17.AST.Type.TypeName.*;
 import static cop5556sp17.Scanner.Kind.ARROW;
@@ -48,7 +46,6 @@ import static cop5556sp17.Scanner.Kind.OP_HEIGHT;
 import static cop5556sp17.Scanner.Kind.OP_WIDTH;
 import static cop5556sp17.Scanner.Kind.*;
 
-import cop5556sp17.AST.*;
 
 public class TypeCheckVisitor implements ASTVisitor {
 
@@ -64,7 +61,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitBinaryChain(BinaryChain binaryChain, Object arg) throws Exception {
 		// TODO Auto-generated method stub
-		Token first = binaryChain.getFirstToken();
+		//Token first = binaryChain.getFirstToken();
 		Chain chain = binaryChain.getE0();
 		chain.visit(this, arg);
 		Token t = binaryChain.getArrow();
@@ -74,23 +71,23 @@ public class TypeCheckVisitor implements ASTVisitor {
 			if (chain.type.equals(URL) &&
 				celem.type.equals(IMAGE)){
 				binaryChain.type = IMAGE;
-			} else if (chain.type.equals(FRAME) &&
-					(celem.getFirstToken().isKind(KW_XLOC)||
-							 celem.getFirstToken().isKind(KW_YLOC))){
-						binaryChain.type = INTEGER;
 			} else if (chain.type == TypeName.FILE &&
 					celem.type == TypeName.IMAGE){
 				binaryChain.type = IMAGE;
-			}  else if (chain.type.equals(FRAME) &&
+			} else if (chain.type.equals(FRAME) && celem instanceof FrameOpChain &&
+					(celem.getFirstToken().isKind(KW_XLOC)||
+							 celem.getFirstToken().isKind(KW_YLOC))){
+						binaryChain.type = INTEGER;
+			}  else if (chain.type.equals(FRAME) && celem instanceof FrameOpChain &&
 					(celem.getFirstToken().isKind(KW_SHOW)||
 					 celem.getFirstToken().isKind(KW_HIDE)||
 					 celem.getFirstToken().isKind(KW_MOVE))){
 				binaryChain.type = FRAME;
-			} else if (chain.type.equals(IMAGE) &&
+			} else if (chain.type.equals(IMAGE) && celem instanceof ImageOpChain &&
 					(celem.getFirstToken().isKind(OP_WIDTH) ||
 					 celem.getFirstToken().isKind(OP_HEIGHT))){
 						binaryChain.type = INTEGER;
-			} else if (chain.type.equals(TypeName.IMAGE) &&
+			} else if (chain.type.equals(TypeName.IMAGE) && celem instanceof FilterOpChain &&
 					(celem.getFirstToken().isKind(OP_GRAY)||
 							 celem.getFirstToken().isKind(OP_BLUR)||
 							 celem.getFirstToken().isKind(OP_CONVOLVE))){
@@ -101,14 +98,14 @@ public class TypeCheckVisitor implements ASTVisitor {
 			} else if (chain.type.equals(IMAGE) &&
 					celem.type.equals(FRAME)){
 						binaryChain.type = FRAME;
-			} else if (chain.type.equals(TypeName.IMAGE) &&
+			} else if (chain.type.equals(TypeName.IMAGE) && celem instanceof ImageOpChain &&
 					(celem.getFirstToken().isKind(KW_SCALE))){
 						binaryChain.type = IMAGE;
-			}   else if (chain.type.equals(TypeName.IMAGE) &&
-					 celem instanceof IdentChain && (celem.type == IMAGE)){
+			}   else if (chain.type.equals(TypeName.IMAGE) && celem instanceof IdentChain &&
+					(celem.type == IMAGE)){
 				binaryChain.type = IMAGE;
-			}	else if (chain.type.equals(TypeName.INTEGER) &&
-					celem instanceof IdentChain   && (celem.type == INTEGER)){
+			}	else if (chain.type.equals(TypeName.INTEGER) && celem instanceof IdentChain &&
+					(celem.type == INTEGER)){
 				binaryChain.type = INTEGER;
 			} else{
 				throw new TypeCheckException("Type check Error");
@@ -197,6 +194,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		ArrayList<Statement> stats = block.getStatements();
 		ArrayList<Dec> decs = block.getDecs();
 		int i=0,j=0;
+		//visit all decs and statements in order they appear in block
 		while (j<stats.size() && i<decs.size()){
 			if (stats.get(j).firstToken.pos < decs.get(i).firstToken.pos){
 				stats.get(j).visit(this, arg);

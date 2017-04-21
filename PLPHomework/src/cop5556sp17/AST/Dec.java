@@ -9,7 +9,7 @@ public class Dec extends ASTNode {
 
 	final Token ident;
 	public Integer slotnumber;
-	boolean init;
+	public boolean init;
 
 	public Dec(Token firstToken, Token ident) {
 		super(firstToken);
@@ -67,7 +67,7 @@ public class Dec extends ASTNode {
 		return v.visitDec(this,arg);
 	}
 
-	public void setInitialized(boolean b) {
+	public void initVal(boolean b) {
 		// TODO Auto-generated method stub
 		init = b;
 	}
