@@ -164,14 +164,22 @@ public class TypeCheckVisitor implements ASTVisitor {
 			} else {
 				throw new TypeCheckException("Type check Error");
 			}
-		} else if(op.kind.equals(DIV)){
+		} else if(op.kind.equals(DIV) || op.kind.equals(MOD)){
 			if (e0.type.equals(INTEGER) && e1.type.equals(INTEGER)){
 				binaryExpression.type = INTEGER;
+			} else if ((e0.type.equals(IMAGE)) && (e1.type.equals(INTEGER))) {
+				binaryExpression.type = TypeName.IMAGE;
 			} else {
 				throw new TypeCheckException("Type check Error");
 			}
 		} else if(op.kind.equals(EQUAL) || op.kind.equals(NOTEQUAL)){
 			if (e0.type.equals(e1.type)){
+				binaryExpression.type = BOOLEAN;
+			} else {
+				throw new TypeCheckException("Type check Error");
+			}
+		} else if (op.kind.equals(AND) || op.kind.equals(OR)) {
+			if (e0.type.equals(TypeName.BOOLEAN) && e1.type.equals(TypeName.BOOLEAN)) {
 				binaryExpression.type = BOOLEAN;
 			} else {
 				throw new TypeCheckException("Type check Error");
@@ -255,6 +263,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 				throw new TypeCheckException("Type Check Error");
 			}
 			frameOpChain.type = NONE;
+			tuple.visit(this, arg);
 		}
 		else{
 			throw new TypeCheckException("Type Check Error			");
@@ -418,6 +427,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 				throw new TypeCheckException("Type Check Error");
 			}
 			imageOpChain.type = TypeName.IMAGE;
+			tuple.visit(this, arg);
 		}
 		return null;
 	}

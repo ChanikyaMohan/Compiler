@@ -3631,7 +3631,7 @@ public class CodeGenVisitorTest {
 
     CodeGenVisitor cv = new CodeGenVisitor(devel,grade,null);
 
-    thrown.expect(AssertionError.class);
+
 
     byte[] bytecode = (byte[]) program.visit(cv, null);
 
@@ -3663,6 +3663,7 @@ public class CodeGenVisitorTest {
 
     String[] args = new String[0]; //create command line argument array to initialize params, none in this case
 
+    thrown.expect(java.lang.AssertionError.class);
     Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
 
     instance.run();
@@ -5250,7 +5251,7 @@ public class CodeGenVisitorTest {
     		// directly execute bytecode
     		String[] args = new String[1]; //create String[] array to initialize params
 
-    		args[0] = new String("/Users/Angpy/Documents/workspace/PLPHomework/Images/Image1.jpeg");
+    		args[0] = new String("C:\\Users\\konya\\workspace\\PLPHomework\\image.jpg");
 
     		Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
     		instance.run();
@@ -5296,6 +5297,7 @@ public class CodeGenVisitorTest {
     		Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
     		//instance.run();
     	}
+
 }
 
 
