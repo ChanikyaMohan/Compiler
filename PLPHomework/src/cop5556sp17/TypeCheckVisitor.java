@@ -412,20 +412,23 @@ public class TypeCheckVisitor implements ASTVisitor {
 		Tuple tuple = imageOpChain.getArg();
 		Token token = imageOpChain.firstToken;
 		//imageOpChain.type = Type.getTypeName(token);
-		if (token.isKind(OP_WIDTH)|| token.isKind( OP_HEIGHT)){
-			int s = tuple.getExprList().size();
+		int s = tuple.getExprList().size();
+		switch(token.kind){
+		case OP_WIDTH: case OP_HEIGHT:
+			//int s = tuple.getExprList().size();
 			if ( s != 0){
 				throw new TypeCheckException("Type Check Error");
 			}
 			imageOpChain.type = TypeName.INTEGER;
-		}
-		else if (token.isKind(KW_SCALE)){
-			int s = tuple.getExprList().size();
+			break;
+		case KW_SCALE:
 			if ( s != 1){
 				throw new TypeCheckException("Type Check Error");
 			}
 			imageOpChain.type = TypeName.IMAGE;
 			tuple.visit(this, arg);
+		default:
+			break;
 		}
 		return null;
 	}
